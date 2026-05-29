@@ -366,6 +366,7 @@ CSS = r"""
   --shadow-sm: 0 1px 2px rgba(14, 42, 64, 0.04);
   --shadow:    0 4px 12px rgba(14, 42, 64, 0.06);
   --shadow-lg: 0 8px 28px rgba(14, 42, 64, 0.10);
+  --shadow-xl: 0 16px 48px rgba(14, 42, 64, 0.18);
   --radius:    12px;
   --radius-sm: 8px;
   --radius-lg: 18px;
@@ -396,6 +397,7 @@ body {
 }
 .header h1 {
   font-size: 1.6rem; margin: 0; font-weight: 700; letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 12px;
 }
 .header .sub { font-size: 0.92rem; opacity: 0.92; margin-top: 4px; }
 .header .meta {
@@ -404,7 +406,7 @@ body {
 .header .meta strong { font-weight: 600; }
 .brand-dot {
   display: inline-block; width: 10px; height: 10px; border-radius: 50%;
-  background: var(--kalla-green-light); margin-right: 8px;
+  background: var(--kalla-green-light);
   box-shadow: 0 0 0 3px rgba(255,255,255,0.20);
 }
 
@@ -413,7 +415,7 @@ body {
   max-width: 1400px; margin: 0 auto; padding: 24px 32px;
 }
 
-/* ─── KPI cards ──────────────────────────────────────────── */
+/* ─── KPI cards (clicables) ──────────────────────────────── */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -423,14 +425,25 @@ body {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 18px 20px;
   display: flex; align-items: center; gap: 14px;
-  box-shadow: var(--shadow-sm); transition: transform .15s, box-shadow .15s;
+  box-shadow: var(--shadow-sm); transition: transform .15s, box-shadow .15s, border-color .15s;
+  position: relative;
 }
-.kpi:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+.kpi.clickable { cursor: pointer; }
+.kpi.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--kalla-primary-light);
+}
+.kpi.active {
+  border-color: var(--kalla-primary);
+  box-shadow: 0 0 0 3px rgba(8,118,178,0.15);
+}
 .kpi-icon {
   width: 44px; height: 44px; border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.4rem; flex-shrink: 0;
+  flex-shrink: 0;
 }
+.kpi-icon svg { width: 22px; height: 22px; }
 .kpi-icon.total    { background: #E6F0F8; color: var(--kalla-primary); }
 .kpi-icon.cumple   { background: #E2F5EC; color: var(--success); }
 .kpi-icon.riesgo   { background: #FCF0DF; color: var(--warning); }
@@ -438,6 +451,65 @@ body {
 .kpi-icon.pendiente{ background: #EEF3F7; color: var(--neutral); }
 .kpi-value { font-size: 1.6rem; font-weight: 700; line-height: 1; color: var(--text-dark); }
 .kpi-label { font-size: 0.78rem; color: var(--text-med); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.kpi-hint {
+  font-size: 0.66rem; color: var(--text-lt); margin-top: 3px;
+  display: flex; align-items: center; gap: 3px;
+}
+
+/* ─── Popover (lista flotante de indicadores) ────────────── */
+.popover-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  display: none;
+}
+.popover-overlay.active { display: block; }
+.popover {
+  position: absolute;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow-xl);
+  min-width: 320px; max-width: 380px; max-height: 480px;
+  overflow: hidden; display: flex; flex-direction: column;
+  animation: popIn .12s ease-out;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.popover-head {
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.popover-head .title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); }
+.popover-head .count { font-size: 0.78rem; color: var(--text-lt); }
+.popover-close {
+  background: var(--surface-2); border: none; width: 26px; height: 26px;
+  border-radius: 7px; cursor: pointer; color: var(--text-med);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; line-height: 1;
+}
+.popover-close:hover { background: #DCE6EE; color: var(--text-dark); }
+.popover-list {
+  overflow-y: auto; flex: 1; padding: 6px 0;
+}
+.popover-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 18px; cursor: pointer; transition: background .12s;
+  border-left: 3px solid transparent;
+}
+.popover-item:hover { background: var(--surface-2); }
+.popover-item .pop-code { font-size: 0.72rem; color: var(--text-lt); font-weight: 600; min-width: 50px; }
+.popover-item .pop-name { font-size: 0.86rem; color: var(--text-dark); flex: 1; line-height: 1.35; }
+.popover-item .pop-pct { font-size: 0.82rem; font-weight: 700; }
+.popover-item.cumple   { border-left-color: var(--success); }
+.popover-item.cumple   .pop-pct { color: var(--success); }
+.popover-item.riesgo   { border-left-color: var(--warning); }
+.popover-item.riesgo   .pop-pct { color: var(--warning); }
+.popover-item.critico  { border-left-color: var(--danger); }
+.popover-item.critico  .pop-pct { color: var(--danger); }
+.popover-item.pendiente { border-left-color: var(--neutral); }
+.popover-item.pendiente .pop-pct { color: var(--neutral); }
+.popover-empty {
+  padding: 28px; text-align: center; color: var(--text-lt); font-size: 0.86rem;
+}
 
 /* ─── Filters ────────────────────────────────────────────── */
 .filters {
@@ -459,7 +531,7 @@ body {
   background: var(--surface-2); color: var(--text-med);
   font-size: 0.85rem; font-weight: 500; cursor: pointer;
   border: 1px solid transparent; transition: all .15s;
-  user-select: none;
+  user-select: none; position: relative;
 }
 .chip:hover { background: #E2EDF4; color: var(--text-dark); }
 .chip.active {
@@ -470,29 +542,66 @@ body {
 .chip.active.persp-procesos    { background: var(--kalla-teal);  box-shadow: 0 2px 6px rgba(2,162,198,0.30); }
 .chip.active.persp-aprendizaje { background: #1A4D8C;            box-shadow: 0 2px 6px rgba(26,77,140,0.30); }
 .chip.year.active { background: var(--text-dark); }
+.chip.year.current::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--kalla-green); display: inline-block;
+}
+.chip.year.current.active::before { background: var(--kalla-green-light); }
+.chip svg { width: 16px; height: 16px; flex-shrink: 0; }
 
-/* ─── Perspective sections ──────────────────────────────── */
+/* ─── Perspective sections (HEROIC HEADERS) ──────────────── */
 .perspective {
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 .persp-header {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 20px; border-radius: var(--radius);
-  color: white; margin-bottom: 14px;
-  box-shadow: var(--shadow-sm);
+  display: flex; align-items: center; gap: 18px;
+  padding: 22px 28px; border-radius: var(--radius-lg);
+  color: white; margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  position: relative; overflow: hidden;
 }
-.persp-header .icon { font-size: 1.4rem; }
-.persp-header .title { font-weight: 700; font-size: 1.05rem; flex: 1; }
-.persp-header .count {
-  background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 999px;
-  font-size: 0.8rem; font-weight: 600;
+.persp-header::after {
+  content: ""; position: absolute; right: -40px; top: -40px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); pointer-events: none;
 }
+.persp-header .persp-icon-wrap {
+  width: 58px; height: 58px; border-radius: 16px;
+  background: rgba(255,255,255,0.20);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.30);
+}
+.persp-header .persp-icon-wrap svg {
+  width: 30px; height: 30px; color: white;
+}
+.persp-header .persp-titles { flex: 1; }
+.persp-header .persp-eyebrow {
+  font-size: 0.74rem; font-weight: 600; opacity: 0.85;
+  text-transform: uppercase; letter-spacing: 0.10em;
+}
+.persp-header .persp-title {
+  font-weight: 700; font-size: 1.45rem; margin-top: 2px;
+  letter-spacing: -0.01em;
+}
+.persp-header .persp-stats {
+  display: flex; gap: 14px; align-items: center;
+  font-size: 0.84rem;
+}
+.persp-stat {
+  background: rgba(255,255,255,0.18);
+  padding: 6px 14px; border-radius: 999px;
+  font-weight: 600; backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.22);
+  white-space: nowrap;
+}
+.persp-stat strong { font-size: 1.05rem; font-weight: 700; }
 .persp-objetivo {
   background: var(--surface); border: 1px solid var(--border);
   border-left: 4px solid currentColor;
-  padding: 12px 18px; border-radius: var(--radius-sm);
-  margin-bottom: 16px; font-size: 0.88rem; color: var(--text-med);
-  line-height: 1.55;
+  padding: 14px 20px; border-radius: var(--radius-sm);
+  margin-bottom: 18px; font-size: 0.88rem; color: var(--text-med);
+  line-height: 1.6;
 }
 .persp-objetivo strong { color: var(--text-dark); font-weight: 600; }
 
@@ -626,6 +735,7 @@ body {
 }
 .tabla td:first-child, .tabla th:first-child { text-align: left; }
 .tabla tbody tr:hover { background: var(--surface-2); }
+.tabla tr.current-year td { background: #E8F4FB; font-weight: 600; }
 
 .year-blocks {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -639,6 +749,7 @@ body {
 .year-block.riesgo  { border-left-color: var(--warning); }
 .year-block.critico { border-left-color: var(--danger); }
 .year-block.pendiente { border-left-color: var(--neutral); }
+.year-block.current { background: #E8F4FB; box-shadow: 0 0 0 2px rgba(8,118,178,0.15); }
 .year-block .yr { font-size: 0.76rem; color: var(--text-lt); font-weight: 600; }
 .year-block .pct { font-size: 1.4rem; font-weight: 700; color: var(--text-dark); margin: 2px 0; }
 .year-block .meta { font-size: 0.78rem; color: var(--text-med); }
@@ -665,9 +776,15 @@ body {
   .header .meta { text-align: left; }
   .container { padding: 18px; }
   .ind-grid { grid-template-columns: 1fr; }
+  .persp-header { padding: 18px; gap: 12px; }
+  .persp-header .persp-icon-wrap { width: 48px; height: 48px; }
+  .persp-header .persp-icon-wrap svg { width: 24px; height: 24px; }
+  .persp-header .persp-title { font-size: 1.15rem; }
+  .persp-header .persp-stats { display: none; }
   .modal { border-radius: var(--radius); }
   .modal-head, .modal-body { padding: 18px; }
   .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .popover { min-width: 280px; max-width: calc(100vw - 32px); }
 }
 .hidden { display: none !important; }
 """
@@ -681,10 +798,12 @@ JS = r"""
 // ════════════════════════════════════════════════════════════
 // Estado global del dashboard
 // ════════════════════════════════════════════════════════════
+const CURRENT_YEAR = new Date().getFullYear();
 const STATE = {
-  perspFilter: 'all',     // 'all' | 'FINANCIERA' | ...
-  yearFilter: 'all',      // 'all' | 2026 | 2027 | ...
-  charts: {},             // cache de charts mini
+  perspFilter: 'all',
+  yearFilter: 'current',  // 'current' | 'all' | número
+  charts: {},
+  activeKpi: null,
 };
 
 const MONTH_ABBR = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
@@ -707,6 +826,19 @@ const PERSP_KEY_TO_SLUG = {
   'APRENDIZAJE Y CRECIMIENTO':'aprendizaje',
 };
 
+// SVG icons profesionales (Lucide-style)
+const ICONS = {
+  total: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>',
+  cumple: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>',
+  riesgo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>',
+  critico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg>',
+  pendiente: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+  FINANCIERA: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
+  ASOCIADOS: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+  'PROCESOS INTERNOS': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>',
+  'APRENDIZAJE Y CRECIMIENTO': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
+};
+
 // ════════════════════════════════════════════════════════════
 // Formateo de valores según tipo de meta
 // ════════════════════════════════════════════════════════════
@@ -725,27 +857,112 @@ function fmtPct(v) {
 }
 
 // ════════════════════════════════════════════════════════════
-// KPI cards
+// KPI cards (clicables, con popover)
 // ════════════════════════════════════════════════════════════
 function renderKPIs() {
   const s = DATA.summary;
   const el = document.getElementById('kpis');
   const cards = [
-    {icon: '📊', label: 'Indicadores', value: s.total, klass: 'total'},
-    {icon: '🟢', label: 'En meta',     value: s.cumple || 0, klass: 'cumple'},
-    {icon: '🟡', label: 'En riesgo',   value: s.riesgo || 0, klass: 'riesgo'},
-    {icon: '🔴', label: 'Crítico',     value: s.critico || 0, klass: 'critico'},
-    {icon: '⚪', label: 'Pendiente',   value: s.pendiente || 0, klass: 'pendiente'},
+    {icon: 'total',     label: 'Indicadores', value: s.total,        klass: 'total',     status: null},
+    {icon: 'cumple',    label: 'En meta',     value: s.cumple || 0,  klass: 'cumple',    status: 'cumple'},
+    {icon: 'riesgo',    label: 'En riesgo',   value: s.riesgo || 0,  klass: 'riesgo',    status: 'riesgo'},
+    {icon: 'critico',   label: 'Crítico',     value: s.critico || 0, klass: 'critico',   status: 'critico'},
+    {icon: 'pendiente', label: 'Pendiente',   value: s.pendiente||0, klass: 'pendiente', status: 'pendiente'},
   ];
-  el.innerHTML = cards.map(c => `
-    <div class="kpi">
-      <div class="kpi-icon ${c.klass}">${c.icon}</div>
-      <div>
-        <div class="kpi-value">${c.value}</div>
-        <div class="kpi-label">${c.label}</div>
+  el.innerHTML = cards.map(c => {
+    const clickable = c.status !== null && c.value > 0;
+    const hint = clickable ? '<div class="kpi-hint">▼ ver indicadores</div>' : '';
+    return `
+      <div class="kpi ${clickable ? 'clickable' : ''}" data-status="${c.status || ''}">
+        <div class="kpi-icon ${c.klass}">${ICONS[c.icon]}</div>
+        <div>
+          <div class="kpi-value">${c.value}</div>
+          <div class="kpi-label">${c.label}</div>
+          ${hint}
+        </div>
       </div>
+    `;
+  }).join('');
+
+  el.querySelectorAll('.kpi.clickable').forEach(card => {
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openPopoverForStatus(card.dataset.status, card);
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// Popover: lista de indicadores en un estado
+// ════════════════════════════════════════════════════════════
+function getAllIndicators() {
+  const arr = [];
+  DATA.perspectives.forEach(p => {
+    p.indicators.forEach(ind => { arr.push({ind, persp: p}); });
+  });
+  return arr;
+}
+
+function openPopoverForStatus(status, anchorEl) {
+  closePopover();
+  const all = getAllIndicators().filter(x => x.ind.latest_status === status);
+  const overlay = document.getElementById('popover-overlay');
+  const pop = document.getElementById('popover');
+  document.querySelectorAll('.kpi.active').forEach(k => k.classList.remove('active'));
+  anchorEl.classList.add('active');
+  STATE.activeKpi = status;
+
+  const items = all.length ? all.map(({ind, persp}) => {
+    const cumpl = ind.latest_cumpl !== null && ind.latest_cumpl !== undefined ? fmtPct(ind.latest_cumpl) : '—';
+    const yr = ind.latest_year || '';
+    return `
+      <div class="popover-item ${status}" data-code="${ind.code}">
+        <span class="pop-code">${ind.code}</span>
+        <span class="pop-name">${escapeHTML(ind.name)}<br><span style="font-size:0.74rem;color:var(--text-lt)">${persp.name} · ${yr || 's/d'}</span></span>
+        <span class="pop-pct">${cumpl}</span>
+      </div>
+    `;
+  }).join('') : '<div class="popover-empty">No hay indicadores en este estado.</div>';
+
+  pop.innerHTML = `
+    <div class="popover-head">
+      <div>
+        <div class="title">${STATUS_LABELS[status]}</div>
+        <div class="count">${all.length} indicador${all.length === 1 ? '' : 'es'}</div>
+      </div>
+      <button class="popover-close" aria-label="Cerrar">×</button>
     </div>
-  `).join('');
+    <div class="popover-list">${items}</div>
+  `;
+
+  // Posicionar bajo del kpi clicado
+  const rect = anchorEl.getBoundingClientRect();
+  const popWidth = 360;
+  let left = rect.left + window.scrollX;
+  const maxLeft = window.innerWidth - popWidth - 16;
+  if (left > maxLeft) left = maxLeft;
+  if (left < 16) left = 16;
+  pop.style.left = left + 'px';
+  pop.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+
+  overlay.classList.add('active');
+
+  pop.querySelector('.popover-close').addEventListener('click', closePopover);
+  overlay.addEventListener('click', closePopover);
+  pop.addEventListener('click', e => e.stopPropagation());
+  pop.querySelectorAll('.popover-item').forEach(it => {
+    it.addEventListener('click', () => {
+      closePopover();
+      openModal(it.dataset.code);
+    });
+  });
+}
+
+function closePopover() {
+  const overlay = document.getElementById('popover-overlay');
+  overlay.classList.remove('active');
+  document.querySelectorAll('.kpi.active').forEach(k => k.classList.remove('active'));
+  STATE.activeKpi = null;
 }
 
 // ════════════════════════════════════════════════════════════
@@ -754,13 +971,14 @@ function renderKPIs() {
 function renderFilters() {
   // Perspectivas
   const persp = document.getElementById('persp-chips');
-  const perspButtons = [{key: 'all', name: 'Todas', icon: '◯'}].concat(
-    DATA.perspectives.map(p => ({key: p.key, name: p.name, icon: p.icon}))
+  const perspButtons = [{key: 'all', name: 'Todas', svg: null}].concat(
+    DATA.perspectives.map(p => ({key: p.key, name: p.name, svg: ICONS[p.key]}))
   );
   persp.innerHTML = perspButtons.map(p => {
     const slug = PERSP_KEY_TO_SLUG[p.key] || '';
+    const icon = p.svg ? p.svg : '';
     return `<div class="chip persp ${slug ? 'persp-'+slug : ''} ${STATE.perspFilter===p.key?'active':''}" data-persp="${p.key}">
-      <span>${p.icon}</span><span>${p.name}</span>
+      ${icon}<span>${p.name}</span>
     </div>`;
   }).join('');
   persp.querySelectorAll('.chip').forEach(c => {
@@ -771,19 +989,25 @@ function renderFilters() {
     });
   });
 
-  // Años
+  // Años: el actual destacado
   const years = document.getElementById('year-chips');
-  const yearButtons = [{key: 'all', label: 'Todos los años'}].concat(
-    DATA.years.map(y => ({key: y, label: y.toString()}))
+  const yearButtons = [{key: 'all', label: 'Todos los años', isCurrent: false}].concat(
+    DATA.years.map(y => ({key: y, label: y.toString(), isCurrent: y === CURRENT_YEAR}))
   );
-  years.innerHTML = yearButtons.map(y => `
-    <div class="chip year ${STATE.yearFilter==y.key?'active':''}" data-year="${y.key}">
-      ${y.label}
-    </div>
-  `).join('');
+  years.innerHTML = yearButtons.map(y => {
+    const isActive = (STATE.yearFilter === 'current' && y.isCurrent) ||
+                     (STATE.yearFilter === y.key);
+    const currentCls = y.isCurrent ? 'current' : '';
+    return `
+      <div class="chip year ${currentCls} ${isActive?'active':''}" data-year="${y.key}">
+        ${y.label}${y.isCurrent ? ' (actual)' : ''}
+      </div>
+    `;
+  }).join('');
   years.querySelectorAll('.chip').forEach(c => {
     c.addEventListener('click', () => {
-      STATE.yearFilter = c.dataset.year === 'all' ? 'all' : parseInt(c.dataset.year);
+      const v = c.dataset.year;
+      STATE.yearFilter = v === 'all' ? 'all' : parseInt(v);
       renderFilters();
       renderPerspectives();
     });
@@ -793,11 +1017,23 @@ function renderFilters() {
 // ════════════════════════════════════════════════════════════
 // Render perspectivas e indicadores
 // ════════════════════════════════════════════════════════════
+function effectiveYear() {
+  if (STATE.yearFilter === 'all') return null;
+  if (STATE.yearFilter === 'current') {
+    const yrs = DATA.years;
+    if (yrs.includes(CURRENT_YEAR)) return CURRENT_YEAR;
+    return yrs[0];
+  }
+  return STATE.yearFilter;
+}
+
 function renderPerspectives() {
   const root = document.getElementById('perspectives');
-  // limpiar mini-charts antes de regenerar
-  Object.values(STATE.charts).forEach(ch => { try { ch.destroy(); } catch(e){} });
-  STATE.charts = {};
+  // limpiar mini-charts
+  Object.entries(STATE.charts).forEach(([k,ch]) => {
+    if (k !== 'detail') { try { ch.destroy(); } catch(e){} }
+  });
+  STATE.charts = STATE.charts.detail ? {detail: STATE.charts.detail} : {};
 
   const visiblePersps = DATA.perspectives.filter(p =>
     STATE.perspFilter === 'all' || STATE.perspFilter === p.key
@@ -808,15 +1044,27 @@ function renderPerspectives() {
     return;
   }
 
+  const effYear = effectiveYear();
+
   root.innerHTML = visiblePersps.map(p => {
     const slug = PERSP_KEY_TO_SLUG[p.key] || '';
-    const cards = p.indicators.map(ind => renderCard(ind, p)).join('');
+    const stats = computePerspStats(p);
+    const cards = p.indicators.map(ind => renderCard(ind, p, effYear)).join('');
+    const icon = ICONS[p.key] || '';
     return `
       <section class="perspective">
-        <div class="persp-header" style="background:linear-gradient(135deg, ${p.accent}, ${shade(p.accent, -15)})">
-          <span class="icon">${p.icon}</span>
-          <span class="title">Perspectiva ${p.name}</span>
-          <span class="count">${p.indicators.length} indicadores</span>
+        <div class="persp-header" style="background:linear-gradient(135deg, ${p.accent}, ${shade(p.accent, -18)})">
+          <div class="persp-icon-wrap">${icon}</div>
+          <div class="persp-titles">
+            <div class="persp-eyebrow">Perspectiva estratégica</div>
+            <div class="persp-title">${p.name}</div>
+          </div>
+          <div class="persp-stats">
+            <div class="persp-stat"><strong>${p.indicators.length}</strong> indicadores</div>
+            ${stats.cumple ? `<div class="persp-stat">🟢 ${stats.cumple}</div>` : ''}
+            ${stats.riesgo ? `<div class="persp-stat">🟡 ${stats.riesgo}</div>` : ''}
+            ${stats.critico ? `<div class="persp-stat">🔴 ${stats.critico}</div>` : ''}
+          </div>
         </div>
         <div class="persp-objetivo" style="color: ${p.accent}">
           <strong>Objetivo general:</strong> <span style="color:var(--text-med)">${escapeHTML(p.objetivo_general)}</span>
@@ -826,7 +1074,7 @@ function renderPerspectives() {
     `;
   }).join('');
 
-  // Generar mini-charts después de inyectar el DOM
+  // Mini-charts
   visiblePersps.forEach(p => {
     p.indicators.forEach(ind => buildMiniChart(ind));
   });
@@ -837,11 +1085,19 @@ function renderPerspectives() {
   });
 }
 
-function renderCard(ind, persp) {
+function computePerspStats(persp) {
+  const stats = {cumple: 0, riesgo: 0, critico: 0, pendiente: 0};
+  persp.indicators.forEach(ind => {
+    if (stats[ind.latest_status] !== undefined) stats[ind.latest_status]++;
+  });
+  return stats;
+}
+
+function renderCard(ind, persp, effYear) {
   // Métricas según filtro de año
   let displayYearObj = null;
-  if (STATE.yearFilter !== 'all') {
-    displayYearObj = ind.yearly.find(y => y.year === STATE.yearFilter);
+  if (effYear !== null) {
+    displayYearObj = ind.yearly.find(y => y.year === effYear);
   } else {
     // último año con datos
     for (let i = ind.yearly.length-1; i>=0; i--) {
@@ -918,7 +1174,6 @@ function buildMiniChart(ind) {
   if (!ctx) return;
   const labels = DATA.months_labels;
   const data = ind.monthly_results.map(r => r === null ? null : r);
-  // Línea de meta: array de 60 valores con meta del año correspondiente
   const metaLine = [];
   for (let i = 0; i < 60; i++) {
     const yi = Math.floor(i / 12);
@@ -987,21 +1242,22 @@ function openModal(code) {
 
   // Año blocks
   const yearBlocks = ind.yearly.map(y => `
-    <div class="year-block ${y.status}">
-      <div class="yr">${y.year}</div>
+    <div class="year-block ${y.status} ${y.year === CURRENT_YEAR ? 'current' : ''}">
+      <div class="yr">${y.year}${y.year === CURRENT_YEAR ? ' · actual' : ''}</div>
       <div class="pct">${y.cumplimiento !== null ? (y.cumplimiento*100).toFixed(0)+'%' : '—'}</div>
       <div class="meta">Meta: ${fmt(y.meta_raw, ind.tipo_meta, ind.unidad)}</div>
       <div class="meta">Resultado: ${fmt(y.avg_result, ind.tipo_meta, ind.unidad)}</div>
     </div>
   `).join('');
 
-  // Tabla mensual
+  // Tabla mensual con resaltado del año actual
   let tabla = `<table class="tabla">
     <thead><tr><th>Año</th>${MONTH_ABBR.map(m=>`<th>${m}</th>`).join('')}</tr></thead>
     <tbody>`;
   for (let yi = 0; yi < 5; yi++) {
     const yr = 2026 + yi;
-    let row = `<tr><td><strong>${yr}</strong></td>`;
+    const isCurrent = yr === CURRENT_YEAR;
+    let row = `<tr class="${isCurrent ? 'current-year' : ''}"><td><strong>${yr}</strong></td>`;
     for (let m = 0; m < 12; m++) {
       const v = ind.monthly_results[yi*12 + m];
       row += `<td>${v === null ? '<span style="color:var(--text-lt)">—</span>' : fmt(v, ind.tipo_meta, ind.unidad)}</td>`;
@@ -1022,7 +1278,7 @@ function openModal(code) {
       <div class="titles">
         <div class="code">${ind.code}</div>
         <div class="name">${escapeHTML(ind.name)}</div>
-        <div class="persp-tag">${persp.icon} ${persp.name} · ${ind.ini_icon} ${escapeHTML(ind.ini)}</div>
+        <div class="persp-tag">${persp.name} · ${ind.ini_icon} ${escapeHTML(ind.ini)}</div>
       </div>
       <button class="modal-close" id="modal-close">×</button>
     </div>
@@ -1058,7 +1314,6 @@ function openModal(code) {
   `;
   document.getElementById('modal-close').addEventListener('click', closeModal);
   overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
-  // chart detallado
   setTimeout(() => buildDetailChart(ind, persp.accent), 50);
 }
 
@@ -1160,7 +1415,12 @@ document.addEventListener('DOMContentLoaded', () => {
   renderKPIs();
   renderFilters();
   renderPerspectives();
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (STATE.activeKpi) closePopover();
+      else closeModal();
+    }
+  });
 });
 """
 
@@ -1187,10 +1447,6 @@ __CSS__
       <div>
         <h1><span class="brand-dot"></span>Plan Estratégico 2026 – 2030</h1>
         <div class="sub">Dashboard de seguimiento · 25 indicadores · 4 perspectivas estratégicas</div>
-      </div>
-      <div class="meta">
-        <div>Última actualización</div>
-        <div><strong>__GENERATED_AT__</strong></div>
       </div>
     </div>
   </header>
@@ -1219,6 +1475,10 @@ __CSS__
 
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
+  </div>
+
+  <div class="popover-overlay" id="popover-overlay">
+    <div class="popover" id="popover"></div>
   </div>
 
   <script>
@@ -1260,8 +1520,7 @@ def render_dashboard_html(payload):
             .replace('__CHARTJS__', _load_chartjs())
             .replace('__CSS__', CSS)
             .replace('__JS__', JS)
-            .replace('__DATA_JSON__', json_str)
-            .replace('__GENERATED_AT__', payload['generated_at']))
+            .replace('__DATA_JSON__', json_str))
     return html
 
 
@@ -1678,7 +1937,6 @@ def build_payload(indicators):
         summary[latest_status] = summary.get(latest_status, 0) + 1
 
     return {
-        'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M'),
         'months_labels': [f"{MES_ABBR[m-1]} {y}" for (y, m) in MONTHS],
         'years': YEARS,
         'perspectives': list(perspectives.values()),
