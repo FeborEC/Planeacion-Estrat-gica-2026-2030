@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plan Estratégico 2026–2030 · Dashboard</title>
-  <meta name="description" content="Dashboard de seguimiento de indicadores del Plan Estratégico 2026–2030.">
   <script>/*!
  * Chart.js v4.4.1
  * https://www.chartjs.org
@@ -22,34 +21,36 @@
 </script>
   <style>
 
-:root {
-  --kalla-primary:       #0876B2;
-  --kalla-primary-dark:  #075A8A;
-  --kalla-primary-light: #2989D0;
-  --kalla-teal:          #02A2C6;
-  --kalla-teal-dark:     #007C95;
-  --kalla-green:         #23A968;
-  --kalla-green-light:   #45BA76;
-  --success: #23A968;
-  --warning: #F0A030;
-  --danger:  #E04B4B;
-  --neutral: #94A6B8;
-  --bg:        #F4F8FB;
-  --surface:   #FFFFFF;
-  --surface-2: #EEF4F8;
-  --border:    #DCE6EE;
-  --text-dark: #0E2A40;
-  --text-med:  #3F5A73;
-  --text-lt:   #7990A4;
-  --shadow-sm: 0 1px 2px rgba(14, 42, 64, 0.04);
-  --shadow:    0 4px 12px rgba(14, 42, 64, 0.06);
-  --shadow-lg: 0 8px 28px rgba(14, 42, 64, 0.10);
-  --shadow-xl: 0 16px 48px rgba(14, 42, 64, 0.18);
-  --radius:    12px;
-  --radius-sm: 8px;
-  --radius-lg: 18px;
-}
 
+:root {
+  --primary:     #0876B2;
+  --primary-dk:  #075A8A;
+  --primary-lt:  #2989D0;
+  --teal:        #02A2C6;
+  --green:       #23A968;
+  --green-lt:    #45BA76;
+  --success:     #22C55E;
+  --warning:     #F59E0B;
+  --danger:      #EF4444;
+  --neutral:     #94A3B8;
+  --bg:          #F1F5F9;
+  --surface:     #FFFFFF;
+  --surface-2:   #F8FAFC;
+  --surface-3:   #EEF4F8;
+  --border:      #E2E8F0;
+  --border-soft: #F1F5F9;
+  --text-dark:   #0F172A;
+  --text-med:    #475569;
+  --text-lt:     #94A3B8;
+  --shadow-xs:   0 1px 2px rgba(15,23,42,0.04);
+  --shadow-sm:   0 1px 4px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+  --shadow:      0 4px 14px rgba(15,23,42,0.07), 0 2px 4px rgba(15,23,42,0.04);
+  --shadow-lg:   0 8px 28px rgba(15,23,42,0.10);
+  --shadow-xl:   0 16px 48px rgba(15,23,42,0.18);
+  --radius:      12px;
+  --radius-sm:   8px;
+  --radius-lg:   18px;
+}
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
@@ -63,9 +64,8 @@ body {
 
 /* ─── Header ─────────────────────────────────────────────── */
 .header {
-  background: linear-gradient(135deg, var(--kalla-primary) 0%, var(--kalla-teal) 100%);
-  color: white;
-  padding: 28px 32px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
+  color: white; padding: 26px 32px;
   box-shadow: var(--shadow);
 }
 .header-inner {
@@ -74,84 +74,52 @@ body {
   flex-wrap: wrap; gap: 20px;
 }
 .header h1 {
-  font-size: 1.6rem; margin: 0; font-weight: 700; letter-spacing: -0.01em;
-  display: flex; align-items: center; gap: 12px;
+  font-size: 1.55rem; margin: 0; font-weight: 700; letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 10px;
 }
-.header .sub { font-size: 0.92rem; opacity: 0.92; margin-top: 4px; }
-.header .meta {
-  font-size: 0.82rem; opacity: 0.86; text-align: right;
+.header .sub { font-size: 0.90rem; opacity: 0.92; margin-top: 4px; }
+.header-kpis {
+  display: flex; gap: 10px; flex-wrap: wrap;
 }
-.header .meta strong { font-weight: 600; }
+.hkpi {
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  display: flex; align-items: center; gap: 10px;
+  backdrop-filter: blur(6px);
+  cursor: pointer; transition: background .15s;
+}
+.hkpi:hover { background: rgba(255,255,255,0.28); }
+.hkpi.clickable:hover { background: rgba(255,255,255,0.30); }
+.hkpi-val { font-size: 1.4rem; font-weight: 800; line-height: 1; color: white; }
+.hkpi-lbl { font-size: 0.70rem; opacity: 0.88; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1px; color: white; }
+.hkpi-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.hkpi-dot.cumple    { background: #4ADE80; }
+.hkpi-dot.riesgo    { background: #FDE68A; }
+.hkpi-dot.critico   { background: #FCA5A5; }
+.hkpi-dot.pendiente { background: rgba(255,255,255,0.45); }
+.hkpi-dot.total     { background: white; }
 .brand-dot {
   display: inline-block; width: 10px; height: 10px; border-radius: 50%;
-  background: var(--kalla-green-light);
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.20);
+  background: var(--green-lt); box-shadow: 0 0 0 3px rgba(255,255,255,0.20);
 }
 
 /* ─── Container ──────────────────────────────────────────── */
-.container {
-  max-width: 1400px; margin: 0 auto; padding: 24px 32px;
-}
+.container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
 
-/* ─── KPI cards (clicables) ──────────────────────────────── */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 14px; margin-bottom: 22px;
-}
-.kpi {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 18px 20px;
-  display: flex; align-items: center; gap: 14px;
-  box-shadow: var(--shadow-sm); transition: transform .15s, box-shadow .15s, border-color .15s;
-  position: relative;
-}
-.kpi.clickable { cursor: pointer; }
-.kpi.clickable:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
-  border-color: var(--kalla-primary-light);
-}
-.kpi.active {
-  border-color: var(--kalla-primary);
-  box-shadow: 0 0 0 3px rgba(8,118,178,0.15);
-}
-.kpi-icon {
-  width: 44px; height: 44px; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.kpi-icon svg { width: 22px; height: 22px; }
-.kpi-icon.total    { background: #E6F0F8; color: var(--kalla-primary); }
-.kpi-icon.cumple   { background: #E2F5EC; color: var(--success); }
-.kpi-icon.riesgo   { background: #FCF0DF; color: var(--warning); }
-.kpi-icon.critico  { background: #FBE6E6; color: var(--danger); }
-.kpi-icon.pendiente{ background: #EEF3F7; color: var(--neutral); }
-.kpi-value { font-size: 1.6rem; font-weight: 700; line-height: 1; color: var(--text-dark); }
-.kpi-label { font-size: 0.78rem; color: var(--text-med); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
-.kpi-hint {
-  font-size: 0.66rem; color: var(--text-lt); margin-top: 3px;
-  display: flex; align-items: center; gap: 3px;
-}
-
-/* ─── Popover (lista flotante de indicadores) ────────────── */
-.popover-overlay {
-  position: fixed; inset: 0; z-index: 90;
-  display: none;
-}
+/* ─── Popover ────────────────────────────────────────────── */
+.popover-overlay { position: fixed; inset: 0; z-index: 90; display: none; }
 .popover-overlay.active { display: block; }
 .popover {
-  position: absolute;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); box-shadow: var(--shadow-xl);
+  position: absolute; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-xl);
   min-width: 320px; max-width: 380px; max-height: 480px;
   overflow: hidden; display: flex; flex-direction: column;
   animation: popIn .12s ease-out;
 }
-@keyframes popIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+@keyframes popIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
 .popover-head {
   padding: 14px 18px; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -159,15 +127,12 @@ body {
 .popover-head .title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); }
 .popover-head .count { font-size: 0.78rem; color: var(--text-lt); }
 .popover-close {
-  background: var(--surface-2); border: none; width: 26px; height: 26px;
+  background: var(--surface-3); border: none; width: 26px; height: 26px;
   border-radius: 7px; cursor: pointer; color: var(--text-med);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
 }
-.popover-close:hover { background: #DCE6EE; color: var(--text-dark); }
-.popover-list {
-  overflow-y: auto; flex: 1; padding: 6px 0;
-}
+.popover-close:hover { background: #DCE6EE; }
+.popover-list { overflow-y: auto; flex: 1; padding: 6px 0; }
 .popover-item {
   display: flex; align-items: center; gap: 10px;
   padding: 9px 18px; cursor: pointer; transition: background .12s;
@@ -176,67 +141,173 @@ body {
 .popover-item:hover { background: var(--surface-2); }
 .popover-item .pop-code { font-size: 0.72rem; color: var(--text-lt); font-weight: 600; min-width: 50px; }
 .popover-item .pop-name { font-size: 0.86rem; color: var(--text-dark); flex: 1; line-height: 1.35; }
-.popover-item .pop-pct { font-size: 0.82rem; font-weight: 700; }
-.popover-item.cumple   { border-left-color: var(--success); }
-.popover-item.cumple   .pop-pct { color: var(--success); }
-.popover-item.riesgo   { border-left-color: var(--warning); }
-.popover-item.riesgo   .pop-pct { color: var(--warning); }
-.popover-item.critico  { border-left-color: var(--danger); }
-.popover-item.critico  .pop-pct { color: var(--danger); }
-.popover-item.pendiente { border-left-color: var(--neutral); }
-.popover-item.pendiente .pop-pct { color: var(--neutral); }
-.popover-empty {
-  padding: 28px; text-align: center; color: var(--text-lt); font-size: 0.86rem;
-}
+.popover-item .pop-pct  { font-size: 0.82rem; font-weight: 700; }
+.popover-item.cumple    { border-left-color: var(--success); } .popover-item.cumple .pop-pct { color: var(--success); }
+.popover-item.riesgo    { border-left-color: var(--warning); } .popover-item.riesgo .pop-pct { color: var(--warning); }
+.popover-item.critico   { border-left-color: var(--danger); }  .popover-item.critico .pop-pct { color: var(--danger); }
+.popover-item.pendiente { border-left-color: var(--neutral); } .popover-item.pendiente .pop-pct { color: var(--neutral); }
+.popover-empty { padding: 28px; text-align: center; color: var(--text-lt); font-size: 0.86rem; }
 
-/* ─── Filters ────────────────────────────────────────────── */
-.filters {
+/* ─── Filters bar ────────────────────────────────────────── */
+.filters-bar {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 14px 18px;
-  display: flex; flex-wrap: wrap; gap: 18px; align-items: center;
-  margin-bottom: 22px; box-shadow: var(--shadow-sm);
+  border-radius: var(--radius); padding: 12px 18px;
+  display: flex; flex-wrap: wrap; gap: 16px; align-items: center;
+  margin-bottom: 20px; box-shadow: var(--shadow-xs);
 }
-.filter-group {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-}
+.filter-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .filter-label {
-  font-size: 0.78rem; font-weight: 600; color: var(--text-med);
-  text-transform: uppercase; letter-spacing: 0.04em; margin-right: 4px;
+  font-size: 0.76rem; font-weight: 700; color: var(--text-med);
+  text-transform: uppercase; letter-spacing: 0.06em;
 }
 .chip {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 7px 13px; border-radius: 999px;
-  background: var(--surface-2); color: var(--text-med);
-  font-size: 0.85rem; font-weight: 500; cursor: pointer;
+  padding: 6px 14px; border-radius: 999px;
+  background: var(--surface-3); color: var(--text-med);
+  font-size: 0.83rem; font-weight: 500; cursor: pointer;
   border: 1px solid transparent; transition: all .15s;
-  user-select: none; position: relative;
+  user-select: none;
 }
 .chip:hover { background: #E2EDF4; color: var(--text-dark); }
-.chip.active {
-  background: var(--kalla-primary); color: white;
-  box-shadow: 0 2px 6px rgba(8, 118, 178, 0.30);
-}
-.chip.active.persp-asociados   { background: var(--kalla-green); box-shadow: 0 2px 6px rgba(35,169,104,0.30); }
-.chip.active.persp-procesos    { background: var(--kalla-teal);  box-shadow: 0 2px 6px rgba(2,162,198,0.30); }
-.chip.active.persp-aprendizaje { background: #1A4D8C;            box-shadow: 0 2px 6px rgba(26,77,140,0.30); }
+.chip.active { background: var(--primary); color: white; box-shadow: 0 2px 6px rgba(8,118,178,0.30); }
+.chip.active.persp-asociados   { background: var(--green);   box-shadow: 0 2px 6px rgba(35,169,104,0.30); }
+.chip.active.persp-procesos    { background: var(--teal);    box-shadow: 0 2px 6px rgba(2,162,198,0.30); }
+.chip.active.persp-aprendizaje { background: #7C3AED;        box-shadow: 0 2px 6px rgba(124,58,237,0.30); }
 .chip.year.active { background: var(--text-dark); }
 .chip.year.current::before {
   content: ""; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--kalla-green); display: inline-block;
+  background: var(--green); display: inline-block;
 }
-.chip.year.current.active::before { background: var(--kalla-green-light); }
-.chip svg { width: 16px; height: 16px; flex-shrink: 0; }
+.chip.year.current.active::before { background: #4ADE80; }
+.chip svg { width: 15px; height: 15px; flex-shrink: 0; }
 
-/* ─── Perspective sections (HEROIC HEADERS) ──────────────── */
-.perspective {
-  margin-bottom: 36px;
+/* ─── Matriz card ────────────────────────────────────────── */
+.matriz-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-sm); margin-bottom: 28px;
 }
+.matriz-footer-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 16px;
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.mleg { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.mleg-item { display: inline-flex; align-items: center; gap: 7px; font-size: 0.80rem; color: var(--text-med); font-weight: 500; }
+.mleg-icon { width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mleg-icon svg { width: 13px; height: 13px; }
+.mleg-icon.cumple    { background: #DCFCE7; color: #16A34A; }
+.mleg-icon.riesgo    { background: #FEF3C7; color: #D97706; }
+.mleg-icon.critico   { background: #FEE2E2; color: #DC2626; }
+.mleg-icon.pendiente { background: #F1F5F9; color: #94A3B8; }
+.mtz-last-update { font-size: 0.76rem; color: var(--text-lt); display: flex; align-items: center; gap: 6px; }
+
+/* Tabla de la matriz */
+.matriz-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.matriz-scroll::-webkit-scrollbar { height: 4px; }
+.matriz-scroll::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 999px; }
+.matriz-table {
+  width: 100%; border-collapse: separate; border-spacing: 0; min-width: 960px;
+}
+.matriz-table th, .matriz-table td {
+  padding: 0; border-bottom: 1px solid var(--border-soft); vertical-align: middle;
+}
+.matriz-table thead th {
+  padding: 11px 8px; font-size: 0.70rem; font-weight: 700;
+  color: var(--text-lt); text-transform: uppercase; letter-spacing: 0.07em;
+  background: var(--surface-2); border-bottom: 1px solid var(--border);
+  white-space: nowrap; text-align: center;
+}
+.mtz-th-persp  { text-align: left !important; padding-left: 20px !important; min-width: 120px; }
+.mtz-th-ind    { text-align: left !important; min-width: 200px; }
+.mtz-th-cumpl  { min-width: 90px; background: var(--surface-3) !important; }
+
+/* Perspectiva cell */
+.mtz-persp-cell { padding: 0 0 0 16px !important; width: 120px; vertical-align: middle; }
+.mtz-persp-wrap {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px 8px 0;
+}
+.mtz-persp-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.mtz-persp-icon svg { width: 17px; height: 17px; }
+.mtz-persp-name { font-size: 0.82rem; font-weight: 700; line-height: 1.2; }
+
+/* Indicador cell */
+.mtz-ind-cell { padding: 12px 16px 12px 8px !important; min-width: 200px; }
+.mtz-ind-name { font-size: 0.84rem; font-weight: 600; color: var(--text-dark); line-height: 1.35; }
+.mtz-ind-code { font-size: 0.66rem; color: var(--text-lt); font-weight: 600; letter-spacing: 0.06em; margin-top: 2px; }
+
+/* Semáforo mensual */
+.mtz-month-cell { text-align: center; padding: 9px 4px !important; min-width: 52px; }
+.mtz-light {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin: 0 auto; cursor: pointer;
+  transition: transform .15s, box-shadow .15s; position: relative;
+}
+.mtz-light:hover { transform: scale(1.22); box-shadow: var(--shadow); z-index: 2; }
+.mtz-light svg { width: 14px; height: 14px; }
+.mtz-light.cumple    { background: #DCFCE7; color: #16A34A; box-shadow: 0 1px 4px rgba(22,163,74,0.20); }
+.mtz-light.riesgo    { background: #FEF3C7; color: #D97706; box-shadow: 0 1px 4px rgba(245,158,11,0.20); }
+.mtz-light.critico   { background: #FEE2E2; color: #DC2626; box-shadow: 0 1px 4px rgba(220,38,38,0.20); }
+.mtz-light.pendiente { background: #F1F5F9; color: #CBD5E1; }
+
+/* Cumplimiento anual */
+.mtz-cumpl-cell { text-align: center; padding: 10px 14px !important; min-width: 90px; background: var(--surface-2); }
+.mtz-cumpl-pct { font-size: 0.90rem; font-weight: 800; letter-spacing: -0.01em; }
+.mtz-cumpl-pct.cumple    { color: #16A34A; }
+.mtz-cumpl-pct.riesgo    { color: var(--warning); }
+.mtz-cumpl-pct.critico   { color: var(--danger); }
+.mtz-cumpl-pct.pendiente { color: var(--neutral); }
+.mtz-mini-bar { width: 100%; height: 3px; border-radius: 999px; background: #E2E8F0; margin-top: 4px; overflow: hidden; }
+.mtz-mini-bar-fill { height: 100%; border-radius: 999px; transition: width .6s; }
+
+/* Row styling */
+.matriz-table tbody tr { transition: background .10s; }
+.matriz-table tbody tr:hover > td { background: #F0F9FF !important; }
+.mtz-first-row > td { border-top: 2px solid var(--border) !important; }
+.mtz-first-row > td.mtz-persp-cell { border-top: none !important; }
+
+/* Tooltip */
+.mtz-tooltip {
+  position: fixed; z-index: 300;
+  background: rgba(15,23,42,0.96); border-radius: var(--radius-sm);
+  padding: 10px 14px; min-width: 180px; max-width: 250px;
+  pointer-events: none; opacity: 0; transition: opacity .12s; color: white;
+  font-size: 0.80rem; box-shadow: var(--shadow-lg);
+}
+.mtz-tooltip.visible { opacity: 1; }
+.mtz-tooltip .t-month { font-size: 0.66rem; opacity: 0.65; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 3px; }
+.mtz-tooltip .t-val   { font-size: 1.05rem; font-weight: 800; }
+.mtz-tooltip .t-meta  { opacity: 0.70; margin-top: 2px; font-size: 0.76rem; }
+.mtz-tooltip .t-cumpl { font-weight: 700; margin-top: 4px; font-size: 0.80rem; }
+.mtz-tooltip .t-cumpl.cumple  { color: #4ADE80; }
+.mtz-tooltip .t-cumpl.riesgo  { color: #FDE68A; }
+.mtz-tooltip .t-cumpl.critico { color: #FCA5A5; }
+
+/* ─── Perspectivas (debajo de la matriz) ─────────────────── */
+.section-title {
+  font-size: 0.72rem; font-weight: 700; color: var(--text-lt);
+  text-transform: uppercase; letter-spacing: 0.10em;
+  margin: 0 0 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title::before {
+  content: ""; width: 3px; height: 14px;
+  background: linear-gradient(180deg, var(--primary) 0%, var(--teal) 100%);
+  border-radius: 999px;
+}
+.perspective { margin-bottom: 36px; }
 .persp-header {
-  display: flex; align-items: center; gap: 18px;
-  padding: 22px 28px; border-radius: var(--radius-lg);
-  color: white; margin-bottom: 16px;
-  box-shadow: var(--shadow);
-  position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 26px; border-radius: var(--radius-lg);
+  color: white; margin-bottom: 14px;
+  box-shadow: var(--shadow); position: relative; overflow: hidden;
 }
 .persp-header::after {
   content: ""; position: absolute; right: -40px; top: -40px;
@@ -244,227 +315,152 @@ body {
   background: rgba(255,255,255,0.08); pointer-events: none;
 }
 .persp-header .persp-icon-wrap {
-  width: 58px; height: 58px; border-radius: 16px;
+  width: 54px; height: 54px; border-radius: 14px;
   background: rgba(255,255,255,0.20);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.30);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.28);
 }
-.persp-header .persp-icon-wrap svg {
-  width: 30px; height: 30px; color: white;
-}
+.persp-header .persp-icon-wrap svg { width: 28px; height: 28px; color: white; }
 .persp-header .persp-titles { flex: 1; }
-.persp-header .persp-eyebrow {
-  font-size: 0.74rem; font-weight: 600; opacity: 0.85;
-  text-transform: uppercase; letter-spacing: 0.10em;
-}
-.persp-header .persp-title {
-  font-weight: 700; font-size: 1.45rem; margin-top: 2px;
-  letter-spacing: -0.01em;
-}
-.persp-header .persp-stats {
-  display: flex; gap: 14px; align-items: center;
-  font-size: 0.84rem;
-}
+.persp-header .persp-eyebrow { font-size: 0.72rem; font-weight: 600; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.10em; }
+.persp-header .persp-title   { font-weight: 700; font-size: 1.40rem; margin-top: 2px; letter-spacing: -0.01em; }
+.persp-header .persp-stats   { display: flex; gap: 10px; align-items: center; font-size: 0.82rem; }
 .persp-stat {
-  background: rgba(255,255,255,0.18);
-  padding: 6px 14px; border-radius: 999px;
-  font-weight: 600; backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,0.22);
-  white-space: nowrap;
+  background: rgba(255,255,255,0.18); padding: 5px 12px; border-radius: 999px;
+  font-weight: 600; border: 1px solid rgba(255,255,255,0.20); white-space: nowrap;
 }
-.persp-stat strong { font-size: 1.05rem; font-weight: 700; }
+.persp-stat strong { font-size: 1.02rem; font-weight: 700; }
 .persp-objetivo {
   background: var(--surface); border: 1px solid var(--border);
   border-left: 4px solid currentColor;
-  padding: 14px 20px; border-radius: var(--radius-sm);
-  margin-bottom: 18px; font-size: 0.88rem; color: var(--text-med);
-  line-height: 1.6;
+  padding: 12px 18px; border-radius: var(--radius-sm);
+  margin-bottom: 16px; font-size: 0.86rem; color: var(--text-med); line-height: 1.6;
 }
 .persp-objetivo strong { color: var(--text-dark); font-weight: 600; }
 
-/* ─── Indicator card ─────────────────────────────────────── */
-.ind-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 16px;
-}
+/* ─── Indicator cards ────────────────────────────────────── */
+.ind-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
 .ind-card {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 18px 20px;
-  box-shadow: var(--shadow-sm);
-  display: flex; flex-direction: column; gap: 12px;
+  border-radius: var(--radius); padding: 16px 18px;
+  box-shadow: var(--shadow-xs);
+  display: flex; flex-direction: column; gap: 10px;
   transition: transform .15s, box-shadow .15s, border-color .15s;
   cursor: pointer; position: relative; overflow: hidden;
 }
 .ind-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: #C1D3E0; }
-.ind-card .accent-bar {
-  position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-}
-.ind-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
-.ind-code { font-size: 0.72rem; color: var(--text-lt); font-weight: 600; letter-spacing: 0.06em; }
-.ind-name { font-size: 0.98rem; font-weight: 700; color: var(--text-dark); margin: 3px 0 0; line-height: 1.35; }
-.ind-ini { font-size: 0.75rem; color: var(--text-med); margin-top: 4px; }
-
+.ind-card .accent-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+.ind-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.ind-code { font-size: 0.70rem; color: var(--text-lt); font-weight: 600; letter-spacing: 0.06em; }
+.ind-name { font-size: 0.96rem; font-weight: 700; color: var(--text-dark); margin: 3px 0 0; line-height: 1.35; }
+.ind-ini  { font-size: 0.74rem; color: var(--text-med); margin-top: 3px; }
 .status-pill {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 5px 10px; border-radius: 999px;
-  font-size: 0.72rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.04em;
-  white-space: nowrap;
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 0.70rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
 }
-.status-pill.cumple    { background: #E2F5EC; color: var(--success); }
-.status-pill.riesgo    { background: #FCF0DF; color: var(--warning); }
-.status-pill.critico   { background: #FBE6E6; color: var(--danger); }
-.status-pill.pendiente { background: #EEF3F7; color: var(--neutral); }
-
+.status-pill.cumple    { background: #DCFCE7; color: #16A34A; }
+.status-pill.riesgo    { background: #FEF3C7; color: #D97706; }
+.status-pill.critico   { background: #FEE2E2; color: var(--danger); }
+.status-pill.pendiente { background: var(--surface-3); color: var(--neutral); }
 .ind-metrics {
   display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px; padding: 10px; background: var(--surface-2);
-  border-radius: var(--radius-sm);
+  gap: 6px; padding: 10px; background: var(--surface-2); border-radius: var(--radius-sm);
 }
 .metric { text-align: center; }
-.metric .label { font-size: 0.66rem; color: var(--text-lt); text-transform: uppercase; letter-spacing: 0.05em; }
-.metric .value { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-top: 2px; }
-.metric .value.cumple    { color: var(--success); }
+.metric .label { font-size: 0.64rem; color: var(--text-lt); text-transform: uppercase; letter-spacing: 0.05em; }
+.metric .value { font-size: 0.94rem; font-weight: 700; color: var(--text-dark); margin-top: 2px; }
+.metric .value.cumple    { color: #16A34A; }
 .metric .value.riesgo    { color: var(--warning); }
 .metric .value.critico   { color: var(--danger); }
 .metric .value.pendiente { color: var(--neutral); }
-
-.chart-wrap { position: relative; height: 110px; }
+.chart-wrap { position: relative; height: 100px; }
 .ind-foot {
   display: flex; justify-content: space-between; gap: 8px;
   font-size: 0.74rem; color: var(--text-med);
-  border-top: 1px solid var(--border); padding-top: 10px;
+  border-top: 1px solid var(--border); padding-top: 8px;
 }
 .foot-cell { display: flex; flex-direction: column; gap: 1px; }
-.foot-cell .l { font-size: 0.66rem; color: var(--text-lt); text-transform: uppercase; letter-spacing: 0.04em; }
+.foot-cell .l { font-size: 0.64rem; color: var(--text-lt); text-transform: uppercase; letter-spacing: 0.04em; }
 .foot-cell .v { font-weight: 600; color: var(--text-dark); }
-.trend-up   { color: var(--success); }
-.trend-down { color: var(--danger); }
-.trend-flat { color: var(--text-lt); }
-
-.alert {
-  margin-top: -4px;
-  padding: 8px 12px; border-radius: var(--radius-sm);
-  font-size: 0.78rem; font-weight: 500;
-  display: flex; align-items: center; gap: 8px;
-}
-.alert.ok       { background: #E2F5EC; color: var(--success); }
-.alert.warn     { background: #FCF0DF; color: #B07000; }
-.alert.critical { background: #FBE6E6; color: #A03030; }
-.alert.pending  { background: var(--surface-2); color: var(--text-med); }
+.trend-up { color: #16A34A; } .trend-down { color: var(--danger); } .trend-flat { color: var(--text-lt); }
+.alert { padding: 7px 10px; border-radius: var(--radius-sm); font-size: 0.76rem; font-weight: 500; display: flex; align-items: center; gap: 7px; }
+.alert.ok       { background: #DCFCE7; color: #166534; }
+.alert.warn     { background: #FEF3C7; color: #92400E; }
+.alert.critical { background: #FEE2E2; color: #991B1B; }
+.alert.pending  { background: var(--surface-3); color: var(--text-med); }
 
 /* ─── Modal ──────────────────────────────────────────────── */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(14, 42, 64, 0.55);
+  position: fixed; inset: 0; background: rgba(14,42,64,0.55);
   z-index: 100; display: none; align-items: flex-start; justify-content: center;
-  padding: 40px 20px; overflow-y: auto;
-  animation: fadeIn .15s;
+  padding: 40px 20px; overflow-y: auto; animation: fadeIn .15s;
 }
 .modal-overlay.active { display: flex; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
 .modal {
   background: var(--surface); border-radius: var(--radius-lg);
-  max-width: 1100px; width: 100%;
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
+  max-width: 1100px; width: 100%; box-shadow: var(--shadow-lg); overflow: hidden;
 }
 .modal-head {
-  padding: 24px 28px; border-bottom: 1px solid var(--border);
-  display: flex; gap: 20px; justify-content: space-between; align-items: flex-start;
+  padding: 22px 26px; border-bottom: 1px solid var(--border);
+  display: flex; gap: 18px; justify-content: space-between; align-items: flex-start;
 }
 .modal-head .titles { flex: 1; min-width: 0; }
-.modal-head .code { font-size: 0.78rem; color: var(--text-lt); font-weight: 600; letter-spacing: 0.06em; }
-.modal-head .name { font-size: 1.3rem; font-weight: 700; color: var(--text-dark); margin: 4px 0; }
-.modal-head .persp-tag { font-size: 0.82rem; color: var(--text-med); }
+.modal-head .code { font-size: 0.76rem; color: var(--text-lt); font-weight: 600; letter-spacing: 0.06em; }
+.modal-head .name { font-size: 1.25rem; font-weight: 700; color: var(--text-dark); margin: 3px 0; }
+.modal-head .persp-tag { font-size: 0.80rem; color: var(--text-med); }
 .modal-close {
-  background: var(--surface-2); border: none; width: 36px; height: 36px;
-  border-radius: 10px; cursor: pointer; font-size: 1.4rem; color: var(--text-med);
+  background: var(--surface-2); border: none; width: 34px; height: 34px;
+  border-radius: 9px; cursor: pointer; font-size: 1.3rem; color: var(--text-med);
   display: flex; align-items: center; justify-content: center;
 }
 .modal-close:hover { background: #E2EDF4; }
-
-.modal-body { padding: 24px 28px; }
-.modal-section { margin-bottom: 24px; }
-.modal-section h3 {
-  font-size: 0.78rem; color: var(--text-lt); font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 10px;
-}
-.modal-section p { margin: 0 0 8px; color: var(--text-med); line-height: 1.6; }
+.modal-body { padding: 22px 26px; }
+.modal-section { margin-bottom: 22px; }
+.modal-section h3 { font-size: 0.76rem; color: var(--text-lt); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 9px; }
+.modal-section p  { margin: 0 0 7px; color: var(--text-med); line-height: 1.6; }
 .formula-box {
-  background: var(--surface-2); border-left: 3px solid var(--kalla-primary);
-  padding: 12px 16px; border-radius: var(--radius-sm);
-  font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.86rem;
-  color: var(--text-dark);
+  background: var(--surface-2); border-left: 3px solid var(--primary);
+  padding: 11px 14px; border-radius: var(--radius-sm);
+  font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.84rem; color: var(--text-dark);
 }
-
-.tabla {
-  width: 100%; border-collapse: separate; border-spacing: 0;
-  font-size: 0.84rem;
-}
-.tabla th, .tabla td {
-  padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: center;
-}
-.tabla th {
-  background: var(--surface-2); color: var(--text-med);
-  font-weight: 600; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em;
-}
+.tabla { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.82rem; }
+.tabla th, .tabla td { padding: 7px 9px; border-bottom: 1px solid var(--border); text-align: center; }
+.tabla th { background: var(--surface-2); color: var(--text-med); font-weight: 600; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; }
 .tabla td:first-child, .tabla th:first-child { text-align: left; }
 .tabla tbody tr:hover { background: var(--surface-2); }
-.tabla tr.current-year td { background: #E8F4FB; font-weight: 600; }
-
-.year-blocks {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
-}
-.year-block {
-  background: var(--surface-2); border-radius: var(--radius-sm);
-  padding: 14px; border-left: 4px solid var(--border);
-}
-.year-block.cumple  { border-left-color: var(--success); }
-.year-block.riesgo  { border-left-color: var(--warning); }
-.year-block.critico { border-left-color: var(--danger); }
-.year-block.pendiente { border-left-color: var(--neutral); }
-.year-block.current { background: #E8F4FB; box-shadow: 0 0 0 2px rgba(8,118,178,0.15); }
-.year-block .yr { font-size: 0.76rem; color: var(--text-lt); font-weight: 600; }
-.year-block .pct { font-size: 1.4rem; font-weight: 700; color: var(--text-dark); margin: 2px 0; }
-.year-block .meta { font-size: 0.78rem; color: var(--text-med); }
-
-.warnings-list {
-  background: #FFF7E0; border-left: 3px solid var(--warning);
-  border-radius: var(--radius-sm); padding: 10px 14px;
-  font-size: 0.82rem; color: #7A5300;
-}
-.warnings-list ul { margin: 4px 0 0 18px; padding: 0; }
-
-.detail-chart-wrap { position: relative; height: 320px; }
-
-/* ─── Footer ─────────────────────────────────────────────── */
-.footer {
-  margin-top: 40px; padding: 24px; text-align: center;
-  font-size: 0.78rem; color: var(--text-lt);
-}
+.tabla tr.current-year td { background: #EFF7FE; font-weight: 600; }
+.year-blocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 9px; }
+.year-block { background: var(--surface-2); border-radius: var(--radius-sm); padding: 13px; border-left: 4px solid var(--border); }
+.year-block.cumple  { border-left-color: #16A34A; } .year-block.riesgo { border-left-color: var(--warning); }
+.year-block.critico { border-left-color: var(--danger); } .year-block.pendiente { border-left-color: var(--neutral); }
+.year-block.current { background: #EFF7FE; box-shadow: 0 0 0 2px rgba(8,118,178,0.15); }
+.year-block .yr  { font-size: 0.74rem; color: var(--text-lt); font-weight: 600; }
+.year-block .pct { font-size: 1.35rem; font-weight: 700; color: var(--text-dark); margin: 2px 0; }
+.year-block .meta { font-size: 0.76rem; color: var(--text-med); }
+.warnings-list { background: #FFF7E0; border-left: 3px solid var(--warning); border-radius: var(--radius-sm); padding: 9px 13px; font-size: 0.80rem; color: #7A5300; }
+.warnings-list ul { margin: 4px 0 0 16px; padding: 0; }
+.detail-chart-wrap { position: relative; height: 300px; }
+.footer { margin-top: 40px; padding: 22px; text-align: center; font-size: 0.76rem; color: var(--text-lt); }
 
 /* ─── Responsive ─────────────────────────────────────────── */
 @media (max-width: 720px) {
-  .header { padding: 22px 18px; }
-  .header h1 { font-size: 1.3rem; }
-  .header .meta { text-align: left; }
-  .container { padding: 18px; }
+  .header { padding: 20px 16px; }
+  .header h1 { font-size: 1.20rem; }
+  .header-kpis { display: none; }
+  .container { padding: 16px; }
   .ind-grid { grid-template-columns: 1fr; }
-  .persp-header { padding: 18px; gap: 12px; }
-  .persp-header .persp-icon-wrap { width: 48px; height: 48px; }
-  .persp-header .persp-icon-wrap svg { width: 24px; height: 24px; }
-  .persp-header .persp-title { font-size: 1.15rem; }
+  .persp-header { padding: 16px; gap: 10px; }
   .persp-header .persp-stats { display: none; }
-  .modal { border-radius: var(--radius); }
-  .modal-head, .modal-body { padding: 18px; }
-  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .persp-header .persp-title { font-size: 1.15rem; }
+  .modal-head, .modal-body { padding: 16px; }
   .popover { min-width: 280px; max-width: calc(100vw - 32px); }
+  .filters-bar { padding: 10px 14px; }
 }
 .hidden { display: none !important; }
+
 
   </style>
 </head>
@@ -472,16 +468,16 @@ body {
   <header class="header">
     <div class="header-inner">
       <div>
-        <h1><span class="brand-dot"></span>Plan Estratégico 2026 – 2030</h1>
-        <div class="sub">Dashboard de seguimiento · 25 indicadores · 4 perspectivas estratégicas</div>
+        <h1><span class="brand-dot"></span> Plan Estratégico 2026 – 2030</h1>
+        <div class="sub">Seguimiento mensual · 25 indicadores · 4 perspectivas estratégicas</div>
       </div>
+      <div class="header-kpis" id="header-kpis"></div>
     </div>
   </header>
 
   <div class="container">
-    <div id="kpis" class="kpi-grid"></div>
 
-    <div class="filters">
+    <div class="filters-bar">
       <div class="filter-group">
         <span class="filter-label">Perspectiva:</span>
         <div id="persp-chips" style="display:flex;gap:8px;flex-wrap:wrap"></div>
@@ -492,13 +488,18 @@ body {
       </div>
     </div>
 
+    <div id="matriz-panel"></div>
+
+    <div class="section-title">Perspectivas e indicadores</div>
     <div id="perspectives"></div>
 
     <div class="footer">
-      Generado automáticamente desde Tablero_Indicadores_PE.xlsx · Paleta inspirada en KALLA<br>
-      Para actualizar: ejecute <code>python3 "Plan Estrategico Dashboard.py"</code> después de modificar el Excel.
+      Generado automáticamente desde Tablero_Indicadores_PE.xlsx<br>
+      Para actualizar: <code>python "Plan Estrategico Dashboard.py"</code>
     </div>
   </div>
+
+  <div class="mtz-tooltip" id="mtz-tooltip"></div>
 
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
@@ -619,24 +620,24 @@ body {
             0.16
           ],
           "monthly_results": [
-            0.08,
-            0.08,
-            0.08,
-            0.08,
-            0.08,
-            0.08,
-            0.08,
-            0.08,
-            0.08,
-            0.08,
-            0.08,
-            0.08,
-            0.09,
-            0.091,
-            0.092,
-            0.093,
-            0.094,
-            0.095,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -685,19 +686,19 @@ body {
               "year": 2026,
               "meta": 0.08,
               "meta_raw": 0.08,
-              "avg_result": 0.08,
-              "cumplimiento": 1.0,
-              "status": "cumple",
-              "n_months": 12
+              "avg_result": null,
+              "cumplimiento": null,
+              "status": "pendiente",
+              "n_months": 0
             },
             {
               "year": 2027,
               "meta": 0.1,
               "meta_raw": 0.1,
-              "avg_result": 0.09249999999999999,
-              "cumplimiento": 0.9249999999999999,
-              "status": "riesgo",
-              "n_months": 6
+              "avg_result": null,
+              "cumplimiento": null,
+              "status": "pendiente",
+              "n_months": 0
             },
             {
               "year": 2028,
@@ -727,11 +728,11 @@ body {
               "n_months": 0
             }
           ],
-          "trend": "up",
-          "accumulated": 0.59375,
+          "trend": null,
+          "accumulated": null,
           "alert": {
-            "level": "warn",
-            "text": "Atención en 2027: 92% de la meta"
+            "level": "pending",
+            "text": "Sin datos cargados aún"
           },
           "warnings": [],
           "allowed_months": [
@@ -748,9 +749,9 @@ body {
             11,
             12
           ],
-          "latest_status": "riesgo",
-          "latest_cumpl": 0.9249999999999999,
-          "latest_year": 2027
+          "latest_status": "pendiente",
+          "latest_cumpl": null,
+          "latest_year": null
         },
         {
           "code": "IND-02",
@@ -781,23 +782,23 @@ body {
           ],
           "monthly_results": [
             null,
-            0.008,
-            0.008,
-            0.007999999999999988,
-            0.008000000000000068,
-            0.007999999999999893,
-            0.007999999999999933,
-            0.008000000000000023,
-            0.008000000000000163,
-            0.008000000000000153,
-            0.00799999999999919,
-            0.008000000000000286,
-            0.008000000000000044,
-            0.008000000000000706,
-            0.008000000000000024,
-            0.00799999999999989,
-            0.007999999999999657,
-            0.008000000000000168,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -846,19 +847,19 @@ body {
               "year": 2026,
               "meta": 0.1,
               "meta_raw": 0.1,
-              "avg_result": 0.007999999999999972,
-              "cumplimiento": 0.07999999999999972,
-              "status": "critico",
-              "n_months": 11
+              "avg_result": null,
+              "cumplimiento": null,
+              "status": "pendiente",
+              "n_months": 0
             },
             {
               "year": 2027,
               "meta": 0.1,
               "meta_raw": 0.1,
-              "avg_result": 0.008000000000000082,
-              "cumplimiento": 0.0800000000000008,
-              "status": "critico",
-              "n_months": 6
+              "avg_result": null,
+              "cumplimiento": null,
+              "status": "pendiente",
+              "n_months": 0
             },
             {
               "year": 2028,
@@ -888,11 +889,11 @@ body {
               "n_months": 0
             }
           ],
-          "trend": "flat",
-          "accumulated": 0.08000000000000168,
+          "trend": null,
+          "accumulated": null,
           "alert": {
-            "level": "critical",
-            "text": "Crítico en 2027: 8% — revisar"
+            "level": "pending",
+            "text": "Sin datos cargados aún"
           },
           "warnings": [],
           "allowed_months": [
@@ -909,9 +910,9 @@ body {
             11,
             12
           ],
-          "latest_status": "critico",
-          "latest_cumpl": 0.0800000000000008,
-          "latest_year": 2027
+          "latest_status": "pendiente",
+          "latest_cumpl": null,
+          "latest_year": null
         },
         {
           "code": "IND-03",
@@ -1271,21 +1272,21 @@ body {
             0.05
           ],
           "monthly_results": [
-            0.045,
-            0.046,
-            0.047,
-            0.048,
-            0.049,
-            0.05,
-            0.051,
-            0.052,
-            0.053,
-            0.054,
-            0.055,
-            0.056,
-            0.1,
-            0.1,
-            0.1,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -1337,19 +1338,19 @@ body {
               "year": 2026,
               "meta": 0.05,
               "meta_raw": 0.05,
-              "avg_result": 0.050499999999999996,
-              "cumplimiento": 0.9947644227255448,
-              "status": "cumple",
-              "n_months": 12
+              "avg_result": null,
+              "cumplimiento": null,
+              "status": "pendiente",
+              "n_months": 0
             },
             {
               "year": 2027,
               "meta": 0.05,
               "meta_raw": 0.05,
-              "avg_result": 0.10000000000000002,
-              "cumplimiento": 0.5,
-              "status": "critico",
-              "n_months": 3
+              "avg_result": null,
+              "cumplimiento": null,
+              "status": "pendiente",
+              "n_months": 0
             },
             {
               "year": 2028,
@@ -1379,11 +1380,11 @@ body {
               "n_months": 0
             }
           ],
-          "trend": "up",
-          "accumulated": 0.5,
+          "trend": null,
+          "accumulated": null,
           "alert": {
-            "level": "critical",
-            "text": "Crítico en 2027: 50% — revisar"
+            "level": "pending",
+            "text": "Sin datos cargados aún"
           },
           "warnings": [],
           "allowed_months": [
@@ -1400,9 +1401,9 @@ body {
             11,
             12
           ],
-          "latest_status": "critico",
-          "latest_cumpl": 0.5,
-          "latest_year": 2027
+          "latest_status": "pendiente",
+          "latest_cumpl": null,
+          "latest_year": null
         },
         {
           "code": "IND-06",
@@ -2770,25 +2771,25 @@ body {
             null,
             null,
             null,
-            5500,
             null,
             null,
             null,
             null,
             null,
-            5846,
             null,
             null,
             null,
             null,
             null,
-            6100,
             null,
             null,
             null,
             null,
             null,
-            6384,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -2831,19 +2832,19 @@ body {
               "year": 2026,
               "meta": 5846,
               "meta_raw": 5846,
-              "avg_result": 5673.0,
-              "cumplimiento": 0.9704071159767362,
-              "status": "cumple",
-              "n_months": 2
+              "avg_result": null,
+              "cumplimiento": null,
+              "status": "pendiente",
+              "n_months": 0
             },
             {
               "year": 2027,
               "meta": 6384,
               "meta_raw": 6384,
-              "avg_result": 6242.0,
-              "cumplimiento": 0.9777568922305764,
-              "status": "cumple",
-              "n_months": 2
+              "avg_result": null,
+              "cumplimiento": null,
+              "status": "pendiente",
+              "n_months": 0
             },
             {
               "year": 2028,
@@ -2873,20 +2874,20 @@ body {
               "n_months": 0
             }
           ],
-          "trend": "up",
-          "accumulated": 0.798,
+          "trend": null,
+          "accumulated": null,
           "alert": {
-            "level": "ok",
-            "text": "En meta en 2027 (98%)"
+            "level": "pending",
+            "text": "Sin datos cargados aún"
           },
           "warnings": [],
           "allowed_months": [
             6,
             12
           ],
-          "latest_status": "cumple",
-          "latest_cumpl": 0.9777568922305764,
-          "latest_year": 2027
+          "latest_status": "pendiente",
+          "latest_cumpl": null,
+          "latest_year": null
         },
         {
           "code": "IND-15",
@@ -3074,18 +3075,18 @@ body {
             0.95
           ],
           "monthly_results": [
-            0.92,
-            0.93,
-            0.9400000000000001,
-            0.9500000000000001,
-            0.9600000000000001,
-            0.9700000000000001,
-            0.98,
-            0.99,
-            1,
-            1.01,
-            1.02,
-            1.03,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -3140,10 +3141,10 @@ body {
               "year": 2026,
               "meta": 0.95,
               "meta_raw": 0.95,
-              "avg_result": 0.9750000000000001,
-              "cumplimiento": 1.0263157894736843,
-              "status": "cumple",
-              "n_months": 12
+              "avg_result": null,
+              "cumplimiento": null,
+              "status": "pendiente",
+              "n_months": 0
             },
             {
               "year": 2027,
@@ -3182,11 +3183,11 @@ body {
               "n_months": 0
             }
           ],
-          "trend": "up",
-          "accumulated": 1.0842105263157895,
+          "trend": null,
+          "accumulated": null,
           "alert": {
-            "level": "ok",
-            "text": "En meta en 2026 (103%)"
+            "level": "pending",
+            "text": "Sin datos cargados aún"
           },
           "warnings": [],
           "allowed_months": [
@@ -3203,9 +3204,9 @@ body {
             11,
             12
           ],
-          "latest_status": "cumple",
-          "latest_cumpl": 1.0263157894736843,
-          "latest_year": 2026
+          "latest_status": "pendiente",
+          "latest_cumpl": null,
+          "latest_year": null
         },
         {
           "code": "IND-17",
@@ -3748,19 +3749,19 @@ body {
             null,
             null,
             null,
-            0.16,
             null,
             null,
             null,
             null,
             null,
-            0.24,
             null,
             null,
             null,
             null,
             null,
-            0.32,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -3809,19 +3810,19 @@ body {
               "year": 2026,
               "meta": 0.3,
               "meta_raw": 0.3,
-              "avg_result": 0.2,
-              "cumplimiento": 0.6666666666666667,
-              "status": "critico",
-              "n_months": 2
+              "avg_result": null,
+              "cumplimiento": null,
+              "status": "pendiente",
+              "n_months": 0
             },
             {
               "year": 2027,
               "meta": 0.45,
               "meta_raw": 0.45,
-              "avg_result": 0.32,
-              "cumplimiento": 0.7111111111111111,
-              "status": "critico",
-              "n_months": 1
+              "avg_result": null,
+              "cumplimiento": null,
+              "status": "pendiente",
+              "n_months": 0
             },
             {
               "year": 2028,
@@ -3851,20 +3852,20 @@ body {
               "n_months": 0
             }
           ],
-          "trend": "up",
-          "accumulated": 0.4571428571428572,
+          "trend": null,
+          "accumulated": null,
           "alert": {
-            "level": "critical",
-            "text": "Crítico en 2027: 71% — revisar"
+            "level": "pending",
+            "text": "Sin datos cargados aún"
           },
           "warnings": [],
           "allowed_months": [
             6,
             12
           ],
-          "latest_status": "critico",
-          "latest_cumpl": 0.7111111111111111,
-          "latest_year": 2027
+          "latest_status": "pendiente",
+          "latest_cumpl": null,
+          "latest_year": null
         },
         {
           "code": "IND-21",
@@ -4656,60 +4657,39 @@ body {
   ],
   "summary": {
     "total": 25,
-    "cumple": 2,
-    "riesgo": 2,
-    "critico": 3,
-    "pendiente": 18
+    "cumple": 0,
+    "riesgo": 1,
+    "critico": 0,
+    "pendiente": 24
   }
 };
 
+
 // ════════════════════════════════════════════════════════════
-// Estado global del dashboard
+// Estado global
 // ════════════════════════════════════════════════════════════
 const CURRENT_YEAR = new Date().getFullYear();
-const STATE = {
-  perspFilter: 'all',
-  yearFilter: 'current',  // 'current' | 'all' | número
-  charts: {},
-  activeKpi: null,
-};
-
+const STATE = { perspFilter: 'all', yearFilter: 'current', charts: {}, activeKpi: null };
 const MONTH_ABBR = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-const STATUS_LABELS = {
-  cumple:    'En meta',
-  riesgo:    'En riesgo',
-  critico:   'Crítico',
-  pendiente: 'Pendiente',
-};
-const STATUS_COLOR = {
-  cumple:    '#23A968',
-  riesgo:    '#F0A030',
-  critico:   '#E04B4B',
-  pendiente: '#94A6B8',
-};
+const STATUS_LABELS = { cumple:'En meta', riesgo:'En riesgo', critico:'Crítico', pendiente:'Pendiente' };
 const PERSP_KEY_TO_SLUG = {
-  'FINANCIERA':'financiera',
-  'ASOCIADOS':'asociados',
-  'PROCESOS INTERNOS':'procesos',
-  'APRENDIZAJE Y CRECIMIENTO':'aprendizaje',
+  'FINANCIERA':'financiera','ASOCIADOS':'asociados',
+  'PROCESOS INTERNOS':'procesos','APRENDIZAJE Y CRECIMIENTO':'aprendizaje'
 };
 
-// SVG icons profesionales (Lucide-style)
 const ICONS = {
-  total: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>',
-  cumple: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>',
-  riesgo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>',
-  critico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg>',
-  pendiente: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-  FINANCIERA: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
-  ASOCIADOS: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
-  'PROCESOS INTERNOS': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>',
-  'APRENDIZAJE Y CRECIMIENTO': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
+  total:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>',
+  cumple:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>',
+  riesgo:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>',
+  critico:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg>',
+  pendiente:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+  FINANCIERA:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
+  ASOCIADOS:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+  'PROCESOS INTERNOS':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>',
+  'APRENDIZAJE Y CRECIMIENTO':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
 };
 
-// ════════════════════════════════════════════════════════════
-// Formateo de valores según tipo de meta
-// ════════════════════════════════════════════════════════════
+// ── Formateo ──────────────────────────────────────────────
 function fmt(v, tipoMeta, unidad) {
   if (v === null || v === undefined || v === '') return '—';
   if (typeof v === 'string') return v;
@@ -4719,91 +4699,91 @@ function fmt(v, tipoMeta, unidad) {
   if (tipoMeta === 'unidades') return Math.round(v).toLocaleString('es');
   return v.toString();
 }
-function fmtPct(v) {
-  if (v === null || v === undefined) return '—';
-  return (v*100).toFixed(0) + '%';
+function fmtPct(v) { if (v === null || v === undefined) return '—'; return (v*100).toFixed(0) + '%'; }
+
+// ── Año efectivo ──────────────────────────────────────────
+function effectiveYear() {
+  if (STATE.yearFilter === 'all') return null;
+  if (STATE.yearFilter === 'current') {
+    return DATA.years.includes(CURRENT_YEAR) ? CURRENT_YEAR : DATA.years[0];
+  }
+  return STATE.yearFilter;
 }
 
-// ════════════════════════════════════════════════════════════
-// KPI cards (clicables, con popover)
-// ════════════════════════════════════════════════════════════
-function renderKPIs() {
-  const s = DATA.summary;
-  const el = document.getElementById('kpis');
-  const cards = [
-    {icon: 'total',     label: 'Indicadores', value: s.total,        klass: 'total',     status: null},
-    {icon: 'cumple',    label: 'En meta',     value: s.cumple || 0,  klass: 'cumple',    status: 'cumple'},
-    {icon: 'riesgo',    label: 'En riesgo',   value: s.riesgo || 0,  klass: 'riesgo',    status: 'riesgo'},
-    {icon: 'critico',   label: 'Crítico',     value: s.critico || 0, klass: 'critico',   status: 'critico'},
-    {icon: 'pendiente', label: 'Pendiente',   value: s.pendiente||0, klass: 'pendiente', status: 'pendiente'},
-  ];
-  el.innerHTML = cards.map(c => {
-    const clickable = c.status !== null && c.value > 0;
-    const hint = clickable ? '<div class="kpi-hint">▼ ver indicadores</div>' : '';
-    return `
-      <div class="kpi ${clickable ? 'clickable' : ''}" data-status="${c.status || ''}">
-        <div class="kpi-icon ${c.klass}">${ICONS[c.icon]}</div>
-        <div>
-          <div class="kpi-value">${c.value}</div>
-          <div class="kpi-label">${c.label}</div>
-          ${hint}
-        </div>
-      </div>
-    `;
-  }).join('');
+// ── Helpers de color/semáforo ─────────────────────────────
+function monthCompliance(ind, yearIdx, monthIdx) {
+  const flatIdx = yearIdx * 12 + monthIdx;
+  const result = ind.monthly_results[flatIdx];
+  if (result === null || result === undefined) return { status: 'pendiente', result: null, cumpl: null };
+  const meta = ind.metas[yearIdx];
+  if (meta === null || meta === undefined || typeof meta !== 'number') return { status: 'pendiente', result, cumpl: null };
+  const tend = (ind.tend || '').toLowerCase().trim();
+  let c;
+  if (tend.startsWith('reducir') || tend.startsWith('disminuir') || tend.startsWith('bajar')) {
+    c = result > 0 ? meta / result : null;
+  } else if (tend.startsWith('mantener')) {
+    c = meta !== 0 ? 1 - Math.abs(result - meta) / Math.abs(meta) : null;
+  } else {
+    c = meta !== 0 ? result / meta : null;
+  }
+  const status = c === null ? 'pendiente' : c >= 0.95 ? 'cumple' : c >= 0.80 ? 'riesgo' : 'critico';
+  return { status, result, cumpl: c };
+}
 
-  el.querySelectorAll('.kpi.clickable').forEach(card => {
-    card.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openPopoverForStatus(card.dataset.status, card);
-    });
+// ── KPIs en header ────────────────────────────────────────
+function renderHeaderKPIs() {
+  const s = DATA.summary;
+  const el = document.getElementById('header-kpis');
+  if (!el) return;
+  const items = [
+    { key: 'total',     label: 'Indicadores', val: s.total,          st: 'total',     clickable: false },
+    { key: 'cumple',    label: 'En meta',      val: s.cumple || 0,   st: 'cumple',    clickable: true  },
+    { key: 'riesgo',    label: 'En riesgo',    val: s.riesgo || 0,   st: 'riesgo',    clickable: true  },
+    { key: 'critico',   label: 'Crítico',      val: s.critico || 0,  st: 'critico',   clickable: true  },
+    { key: 'pendiente', label: 'Sin datos',    val: s.pendiente || 0,st: 'pendiente', clickable: true  },
+  ];
+  el.innerHTML = items.map(c => `
+    <div class="hkpi ${c.clickable && c.val > 0 ? 'clickable' : ''}" data-status="${c.st}">
+      <div class="hkpi-dot ${c.st}"></div>
+      <div>
+        <div class="hkpi-val">${c.val}</div>
+        <div class="hkpi-lbl">${c.label}</div>
+      </div>
+    </div>
+  `).join('');
+  el.querySelectorAll('.hkpi.clickable').forEach(card => {
+    card.addEventListener('click', e => { e.stopPropagation(); openPopoverForStatus(card.dataset.status, card); });
   });
 }
 
-// ════════════════════════════════════════════════════════════
-// Popover: lista de indicadores en un estado
-// ════════════════════════════════════════════════════════════
+// ── Popover ───────────────────────────────────────────────
 function getAllIndicators() {
   const arr = [];
-  DATA.perspectives.forEach(p => {
-    p.indicators.forEach(ind => { arr.push({ind, persp: p}); });
-  });
+  DATA.perspectives.forEach(p => p.indicators.forEach(ind => arr.push({ind, persp: p})));
   return arr;
 }
-
 function openPopoverForStatus(status, anchorEl) {
   closePopover();
   const all = getAllIndicators().filter(x => x.ind.latest_status === status);
   const overlay = document.getElementById('popover-overlay');
   const pop = document.getElementById('popover');
-  document.querySelectorAll('.kpi.active').forEach(k => k.classList.remove('active'));
+  document.querySelectorAll('.hkpi.active').forEach(k => k.classList.remove('active'));
   anchorEl.classList.add('active');
   STATE.activeKpi = status;
-
   const items = all.length ? all.map(({ind, persp}) => {
     const cumpl = ind.latest_cumpl !== null && ind.latest_cumpl !== undefined ? fmtPct(ind.latest_cumpl) : '—';
-    const yr = ind.latest_year || '';
-    return `
-      <div class="popover-item ${status}" data-code="${ind.code}">
-        <span class="pop-code">${ind.code}</span>
-        <span class="pop-name">${escapeHTML(ind.name)}<br><span style="font-size:0.74rem;color:var(--text-lt)">${persp.name} · ${yr || 's/d'}</span></span>
-        <span class="pop-pct">${cumpl}</span>
-      </div>
-    `;
-  }).join('') : '<div class="popover-empty">No hay indicadores en este estado.</div>';
-
+    return `<div class="popover-item ${status}" data-code="${ind.code}">
+      <span class="pop-code">${ind.code}</span>
+      <span class="pop-name">${escapeHTML(ind.name)}<br><span style="font-size:0.72rem;color:var(--text-lt)">${persp.name}</span></span>
+      <span class="pop-pct">${cumpl}</span>
+    </div>`;
+  }).join('') : '<div class="popover-empty">Sin indicadores en este estado.</div>';
   pop.innerHTML = `
     <div class="popover-head">
-      <div>
-        <div class="title">${STATUS_LABELS[status]}</div>
-        <div class="count">${all.length} indicador${all.length === 1 ? '' : 'es'}</div>
-      </div>
-      <button class="popover-close" aria-label="Cerrar">×</button>
+      <div><div class="title">${STATUS_LABELS[status]}</div><div class="count">${all.length} indicador${all.length===1?'':'es'}</div></div>
+      <button class="popover-close">×</button>
     </div>
-    <div class="popover-list">${items}</div>
-  `;
-
-  // Posicionar bajo del kpi clicado
+    <div class="popover-list">${items}</div>`;
   const rect = anchorEl.getBoundingClientRect();
   const popWidth = 360;
   let left = rect.left + window.scrollX;
@@ -4812,335 +4792,310 @@ function openPopoverForStatus(status, anchorEl) {
   if (left < 16) left = 16;
   pop.style.left = left + 'px';
   pop.style.top = (rect.bottom + window.scrollY + 8) + 'px';
-
   overlay.classList.add('active');
-
   pop.querySelector('.popover-close').addEventListener('click', closePopover);
   overlay.addEventListener('click', closePopover);
   pop.addEventListener('click', e => e.stopPropagation());
   pop.querySelectorAll('.popover-item').forEach(it => {
-    it.addEventListener('click', () => {
-      closePopover();
-      openModal(it.dataset.code);
-    });
+    it.addEventListener('click', () => { closePopover(); openModal(it.dataset.code); });
   });
 }
-
 function closePopover() {
-  const overlay = document.getElementById('popover-overlay');
-  overlay.classList.remove('active');
-  document.querySelectorAll('.kpi.active').forEach(k => k.classList.remove('active'));
+  document.getElementById('popover-overlay').classList.remove('active');
+  document.querySelectorAll('.hkpi.active').forEach(k => k.classList.remove('active'));
   STATE.activeKpi = null;
 }
 
-// ════════════════════════════════════════════════════════════
-// Filtros (chips)
-// ════════════════════════════════════════════════════════════
+// ── Filtros ───────────────────────────────────────────────
 function renderFilters() {
-  // Perspectivas
   const persp = document.getElementById('persp-chips');
-  const perspButtons = [{key: 'all', name: 'Todas', svg: null}].concat(
+  const perspButtons = [{key:'all', name:'Todas', svg:null}].concat(
     DATA.perspectives.map(p => ({key: p.key, name: p.name, svg: ICONS[p.key]}))
   );
   persp.innerHTML = perspButtons.map(p => {
     const slug = PERSP_KEY_TO_SLUG[p.key] || '';
-    const icon = p.svg ? p.svg : '';
-    return `<div class="chip persp ${slug ? 'persp-'+slug : ''} ${STATE.perspFilter===p.key?'active':''}" data-persp="${p.key}">
-      ${icon}<span>${p.name}</span>
+    return `<div class="chip persp ${slug?'persp-'+slug:''} ${STATE.perspFilter===p.key?'active':''}" data-persp="${p.key}">
+      ${p.svg||''}<span>${p.name}</span>
     </div>`;
   }).join('');
-  persp.querySelectorAll('.chip').forEach(c => {
-    c.addEventListener('click', () => {
-      STATE.perspFilter = c.dataset.persp;
-      renderFilters();
-      renderPerspectives();
-    });
-  });
+  persp.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    STATE.perspFilter = c.dataset.persp;
+    renderFilters(); renderMatriz(); renderPerspectives();
+  }));
 
-  // Años: el actual destacado
   const years = document.getElementById('year-chips');
-  const yearButtons = [{key: 'all', label: 'Todos los años', isCurrent: false}].concat(
-    DATA.years.map(y => ({key: y, label: y.toString(), isCurrent: y === CURRENT_YEAR}))
+  const yearButtons = [{key:'all', label:'Todos los años', isCurrent:false}].concat(
+    DATA.years.map(y => ({key:y, label:y.toString(), isCurrent: y===CURRENT_YEAR}))
   );
   years.innerHTML = yearButtons.map(y => {
-    const isActive = (STATE.yearFilter === 'current' && y.isCurrent) ||
-                     (STATE.yearFilter === y.key);
-    const currentCls = y.isCurrent ? 'current' : '';
-    return `
-      <div class="chip year ${currentCls} ${isActive?'active':''}" data-year="${y.key}">
-        ${y.label}${y.isCurrent ? ' (actual)' : ''}
-      </div>
-    `;
+    const isActive = (STATE.yearFilter==='current' && y.isCurrent) || (STATE.yearFilter===y.key);
+    return `<div class="chip year ${y.isCurrent?'current':''} ${isActive?'active':''}" data-year="${y.key}">
+      ${y.label}${y.isCurrent?' (actual)':''}
+    </div>`;
   }).join('');
-  years.querySelectorAll('.chip').forEach(c => {
-    c.addEventListener('click', () => {
-      const v = c.dataset.year;
-      STATE.yearFilter = v === 'all' ? 'all' : parseInt(v);
-      renderFilters();
-      renderPerspectives();
-    });
-  });
+  years.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    const v = c.dataset.year;
+    STATE.yearFilter = v==='all' ? 'all' : parseInt(v);
+    renderFilters(); renderMatriz(); renderPerspectives();
+  }));
 }
 
-// ════════════════════════════════════════════════════════════
-// Render perspectivas e indicadores
-// ════════════════════════════════════════════════════════════
-function effectiveYear() {
-  if (STATE.yearFilter === 'all') return null;
-  if (STATE.yearFilter === 'current') {
-    const yrs = DATA.years;
-    if (yrs.includes(CURRENT_YEAR)) return CURRENT_YEAR;
-    return yrs[0];
-  }
-  return STATE.yearFilter;
-}
+// ── MATRIZ mensual de semáforos ───────────────────────────
+function renderMatriz() {
+  const root = document.getElementById('matriz-panel');
+  if (!root) return;
+  const effYear = effectiveYear();
+  const yr = effYear !== null ? effYear : CURRENT_YEAR;
+  const yIdx = yr - 2026;
 
-function renderPerspectives() {
-  const root = document.getElementById('perspectives');
-  // limpiar mini-charts
-  Object.entries(STATE.charts).forEach(([k,ch]) => {
-    if (k !== 'detail') { try { ch.destroy(); } catch(e){} }
-  });
-  STATE.charts = STATE.charts.detail ? {detail: STATE.charts.detail} : {};
+  const ICO_CUMPLE   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>';
+  const ICO_RIESGO   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>';
+  const ICO_CRITICO  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg>';
+  const ICO_PEND     = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/></svg>';
+  const ICO_ST = { cumple: ICO_CUMPLE, riesgo: ICO_RIESGO, critico: ICO_CRITICO, pendiente: ICO_PEND };
 
   const visiblePersps = DATA.perspectives.filter(p =>
     STATE.perspFilter === 'all' || STATE.perspFilter === p.key
   );
 
-  if (visiblePersps.length === 0) {
-    root.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-lt)">No hay perspectivas que coincidan con el filtro.</div>';
+  let rows = '';
+  visiblePersps.forEach(p => {
+    p.indicators.forEach((ind, i) => {
+      const isFirst = i === 0;
+      const perspCell = isFirst ? `
+        <td class="mtz-persp-cell" rowspan="${p.indicators.length}">
+          <div class="mtz-persp-wrap">
+            <div class="mtz-persp-icon" style="background:${hexA(p.accent,0.15)};color:${p.accent}">${ICONS[p.key]||''}</div>
+            <div class="mtz-persp-name" style="color:${p.accent}">${p.name}</div>
+          </div>
+        </td>` : '';
+
+      let monthCells = '';
+      for (let m = 0; m < 12; m++) {
+        const mc = monthCompliance(ind, yIdx, m);
+        const resultFmt = mc.result !== null ? fmt(mc.result, ind.tipo_meta, ind.unidad) : '—';
+        const metaFmt = (ind.metas[yIdx] !== null && typeof ind.metas[yIdx] === 'number') ? fmt(ind.metas[yIdx], ind.tipo_meta, ind.unidad) : '—';
+        const cumplFmt = mc.cumpl !== null ? (mc.cumpl * 100).toFixed(0) + '%' : '—';
+        monthCells += `<td class="mtz-month-cell">
+          <div class="mtz-light ${mc.status}"
+               data-month="${MONTH_ABBR[m]} ${yr}" data-result="${escapeHTML(resultFmt)}"
+               data-meta="${escapeHTML(metaFmt)}" data-cumpl="${cumplFmt}"
+               data-status="${mc.status}" data-code="${ind.code}">
+            ${ICO_ST[mc.status]}
+          </div></td>`;
+      }
+
+      // Cumplimiento anual
+      const yObj = ind.yearly.find(y => y.year === yr) || ind.yearly[0];
+      const ac = yObj ? yObj.cumplimiento : null;
+      const ast = ac === null ? 'pendiente' : ac >= 0.95 ? 'cumple' : ac >= 0.80 ? 'riesgo' : 'critico';
+      const apct = ac !== null ? (ac * 100).toFixed(0) + '%' : '—';
+      const abar = ac !== null ? Math.min(100, Math.max(0, ac * 100)) : 0;
+      const aclr = ast==='cumple'?'#16A34A':ast==='riesgo'?'#F59E0B':ast==='critico'?'#EF4444':'#CBD5E1';
+
+      rows += `<tr class="${isFirst?'mtz-first-row':''}" data-code="${ind.code}">
+        ${perspCell}
+        <td class="mtz-ind-cell">
+          <div class="mtz-ind-name">${escapeHTML(ind.name)}</div>
+          <div class="mtz-ind-code">${ind.code}</div>
+        </td>
+        ${monthCells}
+        <td class="mtz-cumpl-cell">
+          <div class="mtz-cumpl-pct ${ast}">${apct}</div>
+          <div class="mtz-mini-bar"><div class="mtz-mini-bar-fill" style="width:${abar}%;background:${aclr}"></div></div>
+        </td>
+      </tr>`;
+    });
+  });
+
+  // Fecha de última actualización
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' +
+    now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+
+  root.innerHTML = `
+    <div class="matriz-card">
+      <div class="matriz-scroll">
+        <table class="matriz-table">
+          <thead>
+            <tr>
+              <th class="mtz-th-persp">Perspectiva</th>
+              <th class="mtz-th-ind">Indicador</th>
+              ${MONTH_ABBR.map(m=>`<th>${m}</th>`).join('')}
+              <th class="mtz-th-cumpl">Cumpl. ${yr}</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="matriz-footer-bar">
+        <div class="mleg">
+          <span class="mleg-item"><span class="mleg-icon cumple">${ICO_CUMPLE}</span> Cumple meta (≥95%)</span>
+          <span class="mleg-item"><span class="mleg-icon riesgo">${ICO_RIESGO}</span> En riesgo (80–95%)</span>
+          <span class="mleg-item"><span class="mleg-icon critico">${ICO_CRITICO}</span> Crítico (&lt;80%)</span>
+          <span class="mleg-item"><span class="mleg-icon pendiente">${ICO_PEND}</span> Sin datos</span>
+        </div>
+        <div class="mtz-last-update">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Última actualización: ${dateStr}
+        </div>
+      </div>
+    </div>`;
+
+  const tip = document.getElementById('mtz-tooltip');
+  if (!tip) return;
+  root.querySelectorAll('.mtz-light').forEach(light => {
+    light.addEventListener('mouseenter', () => {
+      const d = light.dataset;
+      tip.innerHTML = `<div class="t-month">${d.month}</div><div class="t-val">${d.result}</div><div class="t-meta">Meta: ${d.meta}</div><div class="t-cumpl ${d.status}">Cumplimiento: ${d.cumpl}</div>`;
+      tip.classList.add('visible');
+    });
+    light.addEventListener('mousemove', e => {
+      const w = tip.offsetWidth, h = tip.offsetHeight;
+      let x = e.clientX+14, y = e.clientY+14;
+      if (x+w > window.innerWidth-12) x = e.clientX-w-14;
+      if (y+h > window.innerHeight-12) y = e.clientY-h-14;
+      tip.style.left = x+'px'; tip.style.top = y+'px';
+    });
+    light.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+    light.addEventListener('click', () => openModal(light.dataset.code));
+  });
+  root.querySelectorAll('tr[data-code]').forEach(row => {
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', e => { if(e.target.closest('.mtz-light')) return; openModal(row.dataset.code); });
+  });
+}
+
+// ── Perspectivas e indicadores ────────────────────────────
+function renderPerspectives() {
+  const root = document.getElementById('perspectives');
+  Object.entries(STATE.charts).forEach(([k,ch]) => { if(k!=='detail'){try{ch.destroy();}catch(e){}} });
+  STATE.charts = STATE.charts.detail ? {detail: STATE.charts.detail} : {};
+
+  const visiblePersps = DATA.perspectives.filter(p =>
+    STATE.perspFilter === 'all' || STATE.perspFilter === p.key
+  );
+  if (!visiblePersps.length) {
+    root.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-lt)">Sin perspectivas que coincidan con el filtro.</div>';
     return;
   }
-
   const effYear = effectiveYear();
-
   root.innerHTML = visiblePersps.map(p => {
-    const slug = PERSP_KEY_TO_SLUG[p.key] || '';
     const stats = computePerspStats(p);
     const cards = p.indicators.map(ind => renderCard(ind, p, effYear)).join('');
-    const icon = ICONS[p.key] || '';
-    return `
-      <section class="perspective">
-        <div class="persp-header" style="background:linear-gradient(135deg, ${p.accent}, ${shade(p.accent, -18)})">
-          <div class="persp-icon-wrap">${icon}</div>
-          <div class="persp-titles">
-            <div class="persp-eyebrow">Perspectiva estratégica</div>
-            <div class="persp-title">${p.name}</div>
-          </div>
-          <div class="persp-stats">
-            <div class="persp-stat"><strong>${p.indicators.length}</strong> indicadores</div>
-            ${stats.cumple ? `<div class="persp-stat">🟢 ${stats.cumple}</div>` : ''}
-            ${stats.riesgo ? `<div class="persp-stat">🟡 ${stats.riesgo}</div>` : ''}
-            ${stats.critico ? `<div class="persp-stat">🔴 ${stats.critico}</div>` : ''}
-          </div>
+    return `<section class="perspective">
+      <div class="persp-header" style="background:linear-gradient(135deg,${p.accent},${shade(p.accent,-18)})">
+        <div class="persp-icon-wrap">${ICONS[p.key]||''}</div>
+        <div class="persp-titles">
+          <div class="persp-eyebrow">Perspectiva estratégica</div>
+          <div class="persp-title">${p.name}</div>
         </div>
-        <div class="persp-objetivo" style="color: ${p.accent}">
-          <strong>Objetivo general:</strong> <span style="color:var(--text-med)">${escapeHTML(p.objetivo_general)}</span>
+        <div class="persp-stats">
+          <div class="persp-stat"><strong>${p.indicators.length}</strong> ind.</div>
+          ${stats.cumple  ? `<div class="persp-stat">✅ ${stats.cumple}</div>` : ''}
+          ${stats.riesgo  ? `<div class="persp-stat">⚠️ ${stats.riesgo}</div>` : ''}
+          ${stats.critico ? `<div class="persp-stat">🔴 ${stats.critico}</div>` : ''}
         </div>
-        <div class="ind-grid">${cards}</div>
-      </section>
-    `;
+      </div>
+      <div class="persp-objetivo" style="color:${p.accent}">
+        <strong>Objetivo general:</strong> <span style="color:var(--text-med)">${escapeHTML(p.objetivo_general)}</span>
+      </div>
+      <div class="ind-grid">${cards}</div>
+    </section>`;
   }).join('');
-
-  // Mini-charts
-  visiblePersps.forEach(p => {
-    p.indicators.forEach(ind => buildMiniChart(ind));
-  });
-
-  // Click en card → abrir modal
-  root.querySelectorAll('.ind-card').forEach(card => {
-    card.addEventListener('click', () => openModal(card.dataset.code));
-  });
+  visiblePersps.forEach(p => p.indicators.forEach(ind => buildMiniChart(ind)));
+  root.querySelectorAll('.ind-card').forEach(card => card.addEventListener('click', () => openModal(card.dataset.code)));
 }
 
 function computePerspStats(persp) {
-  const stats = {cumple: 0, riesgo: 0, critico: 0, pendiente: 0};
-  persp.indicators.forEach(ind => {
-    if (stats[ind.latest_status] !== undefined) stats[ind.latest_status]++;
-  });
-  return stats;
+  const s = {cumple:0,riesgo:0,critico:0,pendiente:0};
+  persp.indicators.forEach(ind => { if(s[ind.latest_status]!==undefined) s[ind.latest_status]++; });
+  return s;
 }
 
 function renderCard(ind, persp, effYear) {
-  // Métricas según filtro de año
-  let displayYearObj = null;
-  if (effYear !== null) {
-    displayYearObj = ind.yearly.find(y => y.year === effYear);
-  } else {
-    // último año con datos
-    for (let i = ind.yearly.length-1; i>=0; i--) {
-      if (ind.yearly[i].cumplimiento !== null) { displayYearObj = ind.yearly[i]; break; }
-    }
-    if (!displayYearObj) displayYearObj = ind.yearly[0];
-  }
-
-  const status = displayYearObj.status;
-  const meta = fmt(displayYearObj.meta_raw, ind.tipo_meta, ind.unidad);
-  const result = fmt(displayYearObj.avg_result, ind.tipo_meta, ind.unidad);
-  const cumpl = fmtPct(displayYearObj.cumplimiento);
-  const yr = displayYearObj.year;
-
-  const trendIcon = ind.trend === 'up' ? '↑' : ind.trend === 'down' ? '↓' : ind.trend === 'flat' ? '→' : '·';
-  const trendClass = ind.trend ? 'trend-' + ind.trend : '';
+  let dyObj = null;
+  if (effYear !== null) { dyObj = ind.yearly.find(y => y.year === effYear); }
+  else { for(let i=ind.yearly.length-1;i>=0;i--){ if(ind.yearly[i].cumplimiento!==null){dyObj=ind.yearly[i];break;} } }
+  if (!dyObj) dyObj = ind.yearly[0];
+  const status = dyObj.status;
+  const meta = fmt(dyObj.meta_raw, ind.tipo_meta, ind.unidad);
+  const result = fmt(dyObj.avg_result, ind.tipo_meta, ind.unidad);
+  const cumpl = fmtPct(dyObj.cumplimiento);
+  const yr = dyObj.year;
+  const trendIcon = ind.trend==='up'?'↑':ind.trend==='down'?'↓':ind.trend==='flat'?'→':'·';
+  const trendClass = ind.trend ? 'trend-'+ind.trend : '';
   const accumulated = ind.accumulated !== null ? fmtPct(ind.accumulated) : '—';
-  const alert = ind.alert || {level: 'pending', text: 'Sin datos'};
-
-  return `
-    <div class="ind-card" data-code="${ind.code}">
-      <div class="accent-bar" style="background:${persp.accent}"></div>
-      <div class="ind-head">
-        <div style="min-width:0;flex:1">
-          <div class="ind-code">${ind.code}</div>
-          <h3 class="ind-name">${escapeHTML(ind.name)}</h3>
-          <div class="ind-ini">${ind.ini_icon} ${escapeHTML(ind.ini)}</div>
-        </div>
-        <span class="status-pill ${status}">${STATUS_LABELS[status]}</span>
+  const alert = ind.alert || {level:'pending', text:'Sin datos'};
+  return `<div class="ind-card" data-code="${ind.code}">
+    <div class="accent-bar" style="background:${persp.accent}"></div>
+    <div class="ind-head">
+      <div style="min-width:0;flex:1">
+        <div class="ind-code">${ind.code}</div>
+        <h3 class="ind-name">${escapeHTML(ind.name)}</h3>
+        <div class="ind-ini">${ind.ini_icon} ${escapeHTML(ind.ini)}</div>
       </div>
-
-      <div class="ind-metrics">
-        <div class="metric">
-          <div class="label">Meta ${yr}</div>
-          <div class="value">${meta}</div>
-        </div>
-        <div class="metric">
-          <div class="label">Resultado</div>
-          <div class="value">${result}</div>
-        </div>
-        <div class="metric">
-          <div class="label">Cumpl. ${yr}</div>
-          <div class="value ${status}">${cumpl}</div>
-        </div>
-      </div>
-
-      <div class="chart-wrap"><canvas id="chart-${ind.code}"></canvas></div>
-
-      <div class="ind-foot">
-        <div class="foot-cell">
-          <span class="l">Tendencia</span>
-          <span class="v ${trendClass}">${trendIcon} ${ind.tend}</span>
-        </div>
-        <div class="foot-cell">
-          <span class="l">Avance global</span>
-          <span class="v">${accumulated}</span>
-        </div>
-        <div class="foot-cell">
-          <span class="l">Responsable</span>
-          <span class="v">${escapeHTML(ind.responsable || 'Por definir')}</span>
-        </div>
-      </div>
-
-      <div class="alert ${alert.level}">⚠ ${escapeHTML(alert.text)}</div>
+      <span class="status-pill ${status}">${STATUS_LABELS[status]}</span>
     </div>
-  `;
+    <div class="ind-metrics">
+      <div class="metric"><div class="label">Meta ${yr}</div><div class="value">${meta}</div></div>
+      <div class="metric"><div class="label">Resultado</div><div class="value">${result}</div></div>
+      <div class="metric"><div class="label">Cumpl. ${yr}</div><div class="value ${status}">${cumpl}</div></div>
+    </div>
+    <div class="chart-wrap"><canvas id="chart-${ind.code}"></canvas></div>
+    <div class="ind-foot">
+      <div class="foot-cell"><span class="l">Tendencia</span><span class="v ${trendClass}">${trendIcon} ${ind.tend}</span></div>
+      <div class="foot-cell"><span class="l">Avance global</span><span class="v">${accumulated}</span></div>
+      <div class="foot-cell"><span class="l">Responsable</span><span class="v">${escapeHTML(ind.responsable||'Por definir')}</span></div>
+    </div>
+    <div class="alert ${alert.level}">⚠ ${escapeHTML(alert.text)}</div>
+  </div>`;
 }
 
-// ════════════════════════════════════════════════════════════
-// Mini-chart (sparkline) por indicador
-// ════════════════════════════════════════════════════════════
 function buildMiniChart(ind) {
-  const ctx = document.getElementById('chart-' + ind.code);
+  const ctx = document.getElementById('chart-'+ind.code);
   if (!ctx) return;
-  const labels = DATA.months_labels;
-  const data = ind.monthly_results.map(r => r === null ? null : r);
+  const data = ind.monthly_results.map(r => r===null?null:r);
   const metaLine = [];
-  for (let i = 0; i < 60; i++) {
-    const yi = Math.floor(i / 12);
-    const meta = ind.metas[yi];
-    metaLine.push(typeof meta === 'number' ? meta : null);
-  }
+  for(let i=0;i<60;i++){const yi=Math.floor(i/12);const m=ind.metas[yi];metaLine.push(typeof m==='number'?m:null);}
   const persp = DATA.perspectives.find(p => p.indicators.includes(ind));
   const color = persp ? persp.accent : '#0876B2';
-
-  const chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: 'Resultado',
-          data: data,
-          borderColor: color,
-          backgroundColor: hexA(color, 0.12),
-          tension: 0.3, fill: true,
-          pointRadius: 0, pointHoverRadius: 4,
-          spanGaps: true, borderWidth: 2,
-        },
-        {
-          label: 'Meta',
-          data: metaLine,
-          borderColor: '#94A6B8',
-          borderDash: [4, 4],
-          borderWidth: 1.4,
-          pointRadius: 0, fill: false,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          mode: 'index', intersect: false,
-          callbacks: {
-            label: (ctx) => {
-              if (ctx.raw === null || ctx.raw === undefined) return ctx.dataset.label + ': —';
-              return ctx.dataset.label + ': ' + fmt(ctx.raw, ind.tipo_meta, ind.unidad);
-            }
-          }
-        }
-      },
-      scales: {
-        x: { display: false },
-        y: { display: false, beginAtZero: false }
-      }
-    }
+  STATE.charts[ind.code] = new Chart(ctx, {
+    type:'line',
+    data:{ labels: DATA.months_labels,
+      datasets:[
+        {label:'Resultado',data,borderColor:color,backgroundColor:hexA(color,0.10),tension:0.3,fill:true,pointRadius:0,pointHoverRadius:4,spanGaps:true,borderWidth:2},
+        {label:'Meta',data:metaLine,borderColor:'#94A6B8',borderDash:[4,4],borderWidth:1.4,pointRadius:0,fill:false}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:(c)=>c.raw===null?c.dataset.label+': —':c.dataset.label+': '+fmt(c.raw,ind.tipo_meta,ind.unidad)}}},
+      scales:{x:{display:false},y:{display:false,beginAtZero:false}}}
   });
-  STATE.charts[ind.code] = chart;
 }
 
-// ════════════════════════════════════════════════════════════
-// Modal con detalle del indicador
-// ════════════════════════════════════════════════════════════
+// ── Modal ─────────────────────────────────────────────────
 function openModal(code) {
   const ind = findIndicator(code);
   if (!ind) return;
   const persp = DATA.perspectives.find(p => p.indicators.includes(ind));
   const overlay = document.getElementById('modal-overlay');
   overlay.classList.add('active');
-
-  // Año blocks
   const yearBlocks = ind.yearly.map(y => `
-    <div class="year-block ${y.status} ${y.year === CURRENT_YEAR ? 'current' : ''}">
-      <div class="yr">${y.year}${y.year === CURRENT_YEAR ? ' · actual' : ''}</div>
-      <div class="pct">${y.cumplimiento !== null ? (y.cumplimiento*100).toFixed(0)+'%' : '—'}</div>
-      <div class="meta">Meta: ${fmt(y.meta_raw, ind.tipo_meta, ind.unidad)}</div>
-      <div class="meta">Resultado: ${fmt(y.avg_result, ind.tipo_meta, ind.unidad)}</div>
-    </div>
-  `).join('');
-
-  // Tabla mensual con resaltado del año actual
-  let tabla = `<table class="tabla">
-    <thead><tr><th>Año</th>${MONTH_ABBR.map(m=>`<th>${m}</th>`).join('')}</tr></thead>
-    <tbody>`;
-  for (let yi = 0; yi < 5; yi++) {
-    const yr = 2026 + yi;
-    const isCurrent = yr === CURRENT_YEAR;
-    let row = `<tr class="${isCurrent ? 'current-year' : ''}"><td><strong>${yr}</strong></td>`;
-    for (let m = 0; m < 12; m++) {
-      const v = ind.monthly_results[yi*12 + m];
-      row += `<td>${v === null ? '<span style="color:var(--text-lt)">—</span>' : fmt(v, ind.tipo_meta, ind.unidad)}</td>`;
-    }
-    row += '</tr>';
-    tabla += row;
+    <div class="year-block ${y.status} ${y.year===CURRENT_YEAR?'current':''}">
+      <div class="yr">${y.year}${y.year===CURRENT_YEAR?' · actual':''}</div>
+      <div class="pct">${y.cumplimiento!==null?(y.cumplimiento*100).toFixed(0)+'%':'—'}</div>
+      <div class="meta">Meta: ${fmt(y.meta_raw,ind.tipo_meta,ind.unidad)}</div>
+      <div class="meta">Resultado: ${fmt(y.avg_result,ind.tipo_meta,ind.unidad)}</div>
+    </div>`).join('');
+  let tabla = `<table class="tabla"><thead><tr><th>Año</th>${MONTH_ABBR.map(m=>`<th>${m}</th>`).join('')}</tr></thead><tbody>`;
+  for(let yi=0;yi<5;yi++){
+    const yr=2026+yi;const isCurrent=yr===CURRENT_YEAR;
+    let row=`<tr class="${isCurrent?'current-year':''}"><td><strong>${yr}</strong></td>`;
+    for(let m=0;m<12;m++){const v=ind.monthly_results[yi*12+m];row+=`<td>${v===null?'<span style="color:var(--text-lt)">—</span>':fmt(v,ind.tipo_meta,ind.unidad)}</td>`;}
+    row+='</tr>'; tabla+=row;
   }
-  tabla += '</tbody></table>';
-
-  const warningsHTML = ind.warnings && ind.warnings.length ? `
-    <div class="warnings-list">
-      <strong>⚠ Avisos de validación:</strong>
-      <ul>${ind.warnings.map(w => `<li>${escapeHTML(w)}</li>`).join('')}</ul>
-    </div>` : '';
-
+  tabla+='</tbody></table>';
+  const warningsHTML = ind.warnings&&ind.warnings.length ? `<div class="warnings-list"><strong>⚠ Avisos:</strong><ul>${ind.warnings.map(w=>`<li>${escapeHTML(w)}</li>`).join('')}</ul></div>` : '';
   document.getElementById('modal-content').innerHTML = `
     <div class="modal-head">
       <div class="titles">
@@ -5151,146 +5106,85 @@ function openModal(code) {
       <button class="modal-close" id="modal-close">×</button>
     </div>
     <div class="modal-body">
-      <div class="modal-section">
-        <h3>📐 Fórmula</h3>
-        <div class="formula-box">${escapeHTML(ind.formula)}</div>
-      </div>
-      <div class="modal-section">
-        <h3>📝 Descripción</h3>
-        <p>${escapeHTML(ind.desc)}</p>
-      </div>
-      <div class="modal-section" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+      <div class="modal-section"><h3>📐 Fórmula</h3><div class="formula-box">${escapeHTML(ind.formula)}</div></div>
+      <div class="modal-section"><h3>📝 Descripción</h3><p>${escapeHTML(ind.desc)}</p></div>
+      <div class="modal-section" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px">
         <div><h3>Unidad</h3><p style="color:var(--text-dark);font-weight:600">${escapeHTML(ind.unidad)}</p></div>
-        <div><h3>Tendencia objetivo</h3><p style="color:var(--text-dark);font-weight:600">${ind.tend}</p></div>
+        <div><h3>Tendencia</h3><p style="color:var(--text-dark);font-weight:600">${ind.tend}</p></div>
         <div><h3>Frecuencia</h3><p style="color:var(--text-dark);font-weight:600">${ind.frec}</p></div>
         <div><h3>Responsable</h3><p style="color:var(--text-dark);font-weight:600">${escapeHTML(ind.responsable)}</p></div>
       </div>
       ${warningsHTML}
-      <div class="modal-section">
-        <h3>📅 Cumplimiento por año</h3>
-        <div class="year-blocks">${yearBlocks}</div>
-      </div>
-      <div class="modal-section">
-        <h3>📈 Resultados mensuales (Ene 2026 → Dic 2030)</h3>
-        <div class="detail-chart-wrap"><canvas id="detail-chart"></canvas></div>
-      </div>
-      <div class="modal-section">
-        <h3>📋 Sábana mensual</h3>
-        <div style="overflow-x:auto">${tabla}</div>
-      </div>
-    </div>
-  `;
+      <div class="modal-section"><h3>📅 Cumplimiento por año</h3><div class="year-blocks">${yearBlocks}</div></div>
+      <div class="modal-section"><h3>📈 Resultados mensuales 2026–2030</h3><div class="detail-chart-wrap"><canvas id="detail-chart"></canvas></div></div>
+      <div class="modal-section"><h3>📋 Sábana mensual</h3><div style="overflow-x:auto">${tabla}</div></div>
+    </div>`;
   document.getElementById('modal-close').addEventListener('click', closeModal);
-  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  overlay.addEventListener('click', e => { if(e.target===overlay) closeModal(); });
   setTimeout(() => buildDetailChart(ind, persp.accent), 50);
 }
 
 function buildDetailChart(ind, color) {
   const ctx = document.getElementById('detail-chart');
   if (!ctx) return;
-  if (STATE.charts.detail) try { STATE.charts.detail.destroy(); } catch(e){}
-  const metaLine = [];
-  for (let i = 0; i < 60; i++) {
-    const yi = Math.floor(i / 12);
-    const meta = ind.metas[yi];
-    metaLine.push(typeof meta === 'number' ? meta : null);
-  }
+  if (STATE.charts.detail) try { STATE.charts.detail.destroy(); } catch(e) {}
+  const metaLine=[];
+  for(let i=0;i<60;i++){const yi=Math.floor(i/12);const m=ind.metas[yi];metaLine.push(typeof m==='number'?m:null);}
   STATE.charts.detail = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: DATA.months_labels,
-      datasets: [
-        {
-          label: 'Resultado mensual',
-          data: ind.monthly_results,
-          borderColor: color,
-          backgroundColor: hexA(color, 0.14),
-          tension: 0.25, fill: true,
-          pointRadius: 2.5, pointHoverRadius: 5,
-          spanGaps: true, borderWidth: 2.2,
-        },
-        {
-          label: 'Meta anual',
-          data: metaLine,
-          borderColor: '#94A6B8',
-          borderDash: [6, 4],
-          borderWidth: 1.6,
-          pointRadius: 0, fill: false,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { position: 'bottom', labels: { font: { size: 12 } } },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => {
-              if (ctx.raw === null || ctx.raw === undefined) return ctx.dataset.label + ': sin dato';
-              return ctx.dataset.label + ': ' + fmt(ctx.raw, ind.tipo_meta, ind.unidad);
-            }
-          }
-        }
-      },
-      scales: {
-        x: { ticks: { autoSkip: true, maxRotation: 0, font: { size: 10 } }, grid: { color: '#EEF3F7' } },
-        y: { ticks: { callback: (v) => fmt(v, ind.tipo_meta, ind.unidad), font: { size: 11 } }, grid: { color: '#EEF3F7' } }
-      }
-    }
+    type:'line',
+    data:{labels:DATA.months_labels,
+      datasets:[
+        {label:'Resultado mensual',data:ind.monthly_results,borderColor:color,backgroundColor:hexA(color,0.12),tension:0.25,fill:true,pointRadius:2.5,pointHoverRadius:5,spanGaps:true,borderWidth:2.2},
+        {label:'Meta anual',data:metaLine,borderColor:'#94A6B8',borderDash:[6,4],borderWidth:1.6,pointRadius:0,fill:false}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'bottom',labels:{font:{size:12}}},tooltip:{callbacks:{label:(c)=>c.raw===null?c.dataset.label+': sin dato':c.dataset.label+': '+fmt(c.raw,ind.tipo_meta,ind.unidad)}}},
+      scales:{x:{ticks:{autoSkip:true,maxRotation:0,font:{size:10}},grid:{color:'#EEF3F7'}},y:{ticks:{callback:(v)=>fmt(v,ind.tipo_meta,ind.unidad),font:{size:11}},grid:{color:'#EEF3F7'}}}}
   });
 }
 
 function closeModal() {
   document.getElementById('modal-overlay').classList.remove('active');
-  if (STATE.charts.detail) { try { STATE.charts.detail.destroy(); } catch(e){} delete STATE.charts.detail; }
+  if(STATE.charts.detail){try{STATE.charts.detail.destroy();}catch(e){}delete STATE.charts.detail;}
 }
 
-// ════════════════════════════════════════════════════════════
-// Helpers
-// ════════════════════════════════════════════════════════════
+// ── Helpers ───────────────────────────────────────────────
 function findIndicator(code) {
-  for (const p of DATA.perspectives) {
-    for (const ind of p.indicators) {
-      if (ind.code === code) return ind;
-    }
-  }
+  for(const p of DATA.perspectives) for(const ind of p.indicators) if(ind.code===code) return ind;
   return null;
 }
 function escapeHTML(s) {
-  if (s === null || s === undefined) return '';
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+  if(s===null||s===undefined) return '';
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 }
 function hexA(hex, alpha) {
-  const h = hex.replace('#','');
-  const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
+  const h=hex.replace('#','');
+  const r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);
   return `rgba(${r},${g},${b},${alpha})`;
 }
 function shade(hex, percent) {
-  const h = hex.replace('#','');
-  let r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
-  const f = percent / 100;
-  r = Math.max(0, Math.min(255, Math.round(r + 255*f)));
-  g = Math.max(0, Math.min(255, Math.round(g + 255*f)));
-  b = Math.max(0, Math.min(255, Math.round(b + 255*f)));
-  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+  const h=hex.replace('#','');
+  let r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);
+  const f=percent/100;
+  r=Math.max(0,Math.min(255,Math.round(r+255*f)));
+  g=Math.max(0,Math.min(255,Math.round(g+255*f)));
+  b=Math.max(0,Math.min(255,Math.round(b+255*f)));
+  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
-// ════════════════════════════════════════════════════════════
-// Inicialización
-// ════════════════════════════════════════════════════════════
+// ── Init ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  renderKPIs();
+  renderHeaderKPIs();
   renderFilters();
+  renderMatriz();
   renderPerspectives();
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      if (STATE.activeKpi) closePopover();
-      else closeModal();
-    }
+    if(e.key==='Escape'){ if(STATE.activeKpi) closePopover(); else closeModal(); }
   });
 });
+
 
   </script>
 </body>
 </html>
+
