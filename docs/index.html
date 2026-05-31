@@ -14760,6 +14760,40 @@ function renderMatriz() {
             ${dateStr}
           </div>
         </div>
+
+        <!-- Vista de lista para móvil (visible solo en pantallas pequeñas) -->
+        <div class="mtz-mobile-list" style="display:none;padding:8px 10px 4px;">
+          ${(() => {
+            const yr2 = allYears ? CURRENT_YEAR : (singleYr || CURRENT_YEAR);
+            return visiblePersps.map(p => `
+              <div style="margin-bottom:10px">
+                <div style="font-size:0.62rem;font-weight:800;color:${p.accent};text-transform:uppercase;letter-spacing:0.08em;padding:4px 2px 5px;border-bottom:2px solid ${p.accent}20;margin-bottom:6px;">${p.name}</div>
+                ${p.indicators.map(ind => {
+                  const yObj2 = ind.yearly.find(y=>y.year===yr2)||ind.yearly[0];
+                  const cp2 = yObj2?yObj2.cumplimiento:null;
+                  const st2 = cp2===null?'pendiente':cp2>=0.95?'cumple':cp2>=0.80?'riesgo':'critico';
+                  const stLbl2 = {cumple:'En meta ✓',riesgo:'En riesgo ⚠',critico:'Crítico ✗',pendiente:'Sin datos'}[st2];
+                  const stClr2 = {cumple:'#16A34A',riesgo:'#D97706',critico:'#DC2626',pendiente:'#94A3B8'}[st2];
+                  const stBg2 = {cumple:'#DCFCE7',riesgo:'#FEF3C7',critico:'#FEE2E2',pendiente:'#F1F5F9'}[st2];
+                  const lastD2 = findLastDataMonth(ind);
+                  const pct2 = cp2!==null?Math.round(cp2*100)+'%':'—';
+                  return `<div class="mtz-mob-row" data-code="${ind.code}"
+                    style="background:white;border-radius:10px;padding:10px 12px;margin-bottom:6px;border:1px solid #E2E8F0;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-size:0.83rem;font-weight:700;color:#0F172A;line-height:1.3;white-space:normal;">${escapeHTML(ind.name)}</div>
+                      <div style="font-size:0.63rem;color:${p.accent};font-weight:700;letter-spacing:0.05em;margin-top:2px;">${ind.code} · ${escapeHTML(ind.ini)}</div>
+                      ${lastD2?`<div style="font-size:0.62rem;color:#94A3B8;margin-top:2px;">Último: ${fmt(lastD2.val,ind.tipo_meta,ind.unidad)} · ${lastD2.label}</div>`:''}
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+                      <span style="font-size:1.10rem;font-weight:900;color:${stClr2};line-height:1;">${pct2}</span>
+                      <span style="background:${stBg2};color:${stClr2};font-size:0.60rem;font-weight:700;padding:2px 7px;border-radius:999px;">${stLbl2}</span>
+                    </div>
+                  </div>`;
+                }).join('')}
+              </div>
+            `).join('');
+          })()}
+        </div>
       </div>
     </div>`;
 
@@ -14788,6 +14822,9 @@ function renderMatriz() {
       if(e.target.closest('.mtz-light')) return;
       scrollToIndicator(row.dataset.code, null);
     });
+  });
+  root.querySelectorAll('.mtz-mob-row').forEach(row => {
+    row.addEventListener('click', () => openModal(row.dataset.code));
   });
 }
 
