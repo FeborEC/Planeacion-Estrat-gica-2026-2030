@@ -416,6 +416,7 @@ body {
   padding: 0 !important; position: sticky; left: 0; z-index: 10;
   background: #1565C0 !important;
   border-right: 3px solid rgba(255,255,255,0.25) !important;
+  vertical-align: middle !important;
 }
 /* Col Cumpl */
 .mtz-th-cumpl {
@@ -14778,7 +14779,7 @@ function renderMatriz() {
   if (allYears) {
     const nowM = new Date().getMonth();
     theadRow1 = `<tr>
-      <th class="mtz-th-ind" rowspan="2" style="vertical-align:middle;padding-left:18px !important;font-size:0.70rem;font-weight:800;letter-spacing:0.08em;">
+      <th class="mtz-th-ind" rowspan="2" style="vertical-align:middle;text-align:center !important;padding-left:0 !important;font-size:0.70rem;font-weight:800;letter-spacing:0.08em;">
         INDICADOR
       </th>
       ${yearsToShow.map(yr => `<th class="mtz-th-year ${yr===CURRENT_YEAR?'mtz-th-year-current':''}" colspan="12">
