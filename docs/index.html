@@ -14692,11 +14692,18 @@ function renderCard(ind, persp, effYear) {
     critical: 'Crítico en ' + yr + ': ' + cumpl + ' de la meta',
     pending: 'Sin datos cargados aún'
   };
+  // Construir explicación de cómo se evalúa el cumplimiento de este indicador
+  const tendExpl = tendLower.includes('reducir')||tendLower.includes('disminuir')
+    ? `Se evalúa como Meta÷Resultado: mientras más bajo el resultado respecto a la meta (${fmt(dyObj.meta_raw, ind.tipo_meta, ind.unidad)}), mejor el cumplimiento.`
+    : tendLower.includes('mantener')
+    ? `Se evalúa por proximidad a la meta (${fmt(dyObj.meta_raw, ind.tipo_meta, ind.unidad)}): 1 − |Resultado − Meta| / |Meta|. Entre más cercano a la meta, mayor cumplimiento.`
+    : `Se evalúa como Resultado÷Meta (${fmt(dyObj.meta_raw, ind.tipo_meta, ind.unidad)}): entre mayor sea el resultado respecto a la meta, mejor el cumplimiento.`;
+
   const alertSubs = {
-    ok: 'El indicador cumple el objetivo ' + yr + '.',
-    warn: 'Se recomienda tomar acciones para alcanzar el 100% de cumplimiento.',
-    critical: 'Requiere intervención inmediata.',
-    pending: 'Ingresa los datos en el Excel y regenera el dashboard.'
+    ok:       tendExpl,
+    warn:     tendExpl,
+    critical: tendExpl,
+    pending:  `Fórmula de evaluación: ${ind.formula}. Ingresa los datos en el Excel y regenera el dashboard para ver el cumplimiento.`
   };
 
   // KPI icons
@@ -14804,7 +14811,6 @@ function renderCard(ind, persp, effYear) {
         <div class="foot-kpi-info">
           <div class="l">Responsable</div>
           <div class="v">${escapeHTML(ind.responsable||'Por definir')}</div>
-          <div class="s">Área responsable</div>
         </div>
       </div>
     </div>
