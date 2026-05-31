@@ -276,15 +276,15 @@ body {
 
 /* Tarjetas de perspectiva en la barra de filtros */
 .persp-filter-row {
-  display: flex; gap: 10px; flex-wrap: wrap; align-items: stretch;
+  display: flex; gap: 10px; flex-wrap: nowrap; align-items: stretch;
   flex: 1;
 }
 .persp-filter-card {
   display: flex; align-items: center; gap: 10px;
   background: var(--surface-2); border: 2px solid var(--border);
-  border-radius: 14px; padding: 9px 12px;
+  border-radius: 14px; padding: 9px 14px;
   cursor: pointer; transition: all .15s; user-select: none;
-  flex: 1; min-width: 130px; max-width: 210px;
+  flex: 1; min-width: 0; max-width: none;
   position: relative; overflow: visible;
   box-sizing: border-box;
 }
@@ -309,8 +309,8 @@ body {
 }
 .pfc-name  {
   font-size: 0.76rem; font-weight: 700; color: var(--text-dark);
-  line-height: 1.25; word-break: break-word; hyphens: auto;
-  white-space: normal;
+  line-height: 1.25; word-break: normal; hyphens: none;
+  white-space: normal; overflow-wrap: break-word;
 }
 .pfc-count { font-size: 0.63rem; color: var(--text-lt); font-weight: 500; margin-top: 1px; white-space: nowrap; }
 .pfc-pct   { font-size: 0.86rem; font-weight: 800; margin-top: 3px; }
@@ -375,7 +375,7 @@ body {
 .matriz-scroll::-webkit-scrollbar-thumb { background: #94A3B8; border-radius: 999px; }
 .matriz-scroll::-webkit-scrollbar-thumb:hover { background: #64748B; }
 
-/* Tabla */
+/* ─── Matriz tabla ───────────────────────────────────────── */
 .matriz-table {
   border-collapse: separate; border-spacing: 0;
   table-layout: fixed;
@@ -384,38 +384,63 @@ body {
   padding: 0; border-bottom: 1px solid var(--border-soft); vertical-align: middle;
   white-space: nowrap;
 }
+
+/* ── Encabezados matriz — paleta azul degradada ─────────── */
 .matriz-table thead th {
-  padding: 10px 6px; font-size: 0.66rem; font-weight: 700;
-  color: var(--text-lt); text-transform: uppercase; letter-spacing: 0.06em;
-  background: var(--surface-2); border-bottom: 1px solid var(--border);
+  padding: 0; font-size: 0.65rem; font-weight: 700;
+  color: white; text-transform: uppercase; letter-spacing: 0.07em;
+  background: #1976D2;
+  border-bottom: none;
   text-align: center; position: sticky; top: 0; z-index: 5;
+  transition: background .2s;
 }
-/* Año header (grupo) */
+/* Celda de mes: abbr + nombre */
+.mtz-th-mes { padding: 0 !important; width: 72px; min-width: 72px; }
+.mtz-th-mes-inner {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 8px 4px 7px;
+  border-bottom: 3px solid transparent;
+  border-right: 1px solid rgba(255,255,255,0.10);
+}
+.mtz-th-mes-abbr { font-size: 0.70rem; font-weight: 800; letter-spacing: 0.06em; color: white; }
+.mtz-th-mes-full { font-size: 0.57rem; color: rgba(255,255,255,0.72); margin-top: 3px; text-transform: capitalize; font-weight: 500; }
+/* Mes actual — azul claro, texto blanco */
+.mtz-th-mes.current { background: #42A5F5 !important; }
+.mtz-th-mes.current .mtz-th-mes-inner { border-bottom-color: white; }
+.mtz-th-mes.current .mtz-th-mes-abbr { color: white; font-size: 0.74rem; font-weight: 900; }
+.mtz-th-mes.current .mtz-th-mes-full { color: rgba(255,255,255,0.92); }
+/* Año header */
 .mtz-th-year {
-  background: var(--surface-3) !important;
-  font-size: 0.74rem !important; font-weight: 800 !important;
-  color: var(--primary) !important; padding: 6px 8px !important;
-  border-right: 2px solid var(--border) !important;
-  letter-spacing: 0.04em !important;
+  background: #1565C0 !important;
+  font-size: 0.70rem !important; font-weight: 900 !important;
+  color: white !important; padding: 9px 10px !important;
+  border-right: 2px solid rgba(255,255,255,0.20) !important;
+  letter-spacing: 0.08em !important;
 }
+.mtz-th-year-current { background: #0D47A1 !important; }
+/* Col Indicador */
 .mtz-th-ind {
-  text-align: left !important; width: 220px; min-width: 220px; max-width: 220px;
-  padding-left: 16px !important; position: sticky; left: 0; z-index: 10;
-  background: var(--surface-2) !important;
-  border-right: 2px solid var(--border) !important;
+  text-align: left !important; width: 240px; min-width: 240px; max-width: 240px;
+  padding: 0 !important; position: sticky; left: 0; z-index: 10;
+  background: #1565C0 !important;
+  border-right: 3px solid rgba(255,255,255,0.25) !important;
 }
+/* Col Cumpl */
 .mtz-th-cumpl {
-  width: 78px; min-width: 78px; max-width: 78px;
-  background: var(--surface-3) !important;
-  border-left: 2px solid var(--border) !important;
+  width: 88px; min-width: 88px; max-width: 88px;
+  background: #1565C0 !important;
+  border-left: 3px solid rgba(255,255,255,0.20) !important;
   position: sticky; z-index: 10;
+  padding: 0 !important;
 }
+/* Separador entre años */
+.mtz-year-sep { border-left: 2px solid rgba(255,255,255,0.18) !important; }
 
 /* Indicador cell */
 .mtz-ind-cell {
-  padding: 10px 12px 10px 16px !important; width: 220px; min-width: 220px; max-width: 220px;
+  padding: 10px 12px 10px 18px !important; width: 230px; min-width: 230px; max-width: 230px;
   position: sticky; left: 0; z-index: 4;
-  background: white; border-right: 2px solid var(--border) !important;
+  background: white; border-right: 3px solid var(--border) !important;
 }
 .mtz-ind-cell::after {
   content: ''; position: absolute; right: -1px; top: 0; bottom: 0;
@@ -426,10 +451,10 @@ body {
 .mtz-ind-code { font-size: 0.64rem; color: var(--text-lt); font-weight: 600; letter-spacing: 0.06em; margin-top: 2px; }
 
 /* Semáforo mensual */
-.mtz-month-cell { text-align: center; padding: 6px 3px !important; width: 62px; min-width: 62px; }
+.mtz-month-cell { text-align: center; padding: 6px 3px !important; width: 72px; min-width: 72px; }
 .mtz-year-sep { border-left: 2px solid var(--border) !important; }
 .mtz-light {
-  width: 52px; height: 26px; border-radius: 6px;
+  width: 62px; height: 26px; border-radius: 6px;
   display: inline-flex; align-items: center; justify-content: center;
   margin: 0 auto; cursor: pointer;
   transition: transform .12s, box-shadow .12s; position: relative;
@@ -446,9 +471,9 @@ body {
 /* Cumplimiento col */
 .mtz-cumpl-cell {
   text-align: center; padding: 8px 8px !important;
-  width: 78px; min-width: 78px; max-width: 78px;
+  width: 88px; min-width: 88px; max-width: 88px;
   background: var(--surface-2);
-  border-left: 2px solid var(--border) !important;
+  border-left: 3px solid var(--border) !important;
   position: sticky; z-index: 4;
 }
 .mtz-cumpl-pct { font-size: 0.86rem; font-weight: 800; }
@@ -567,6 +592,98 @@ body {
 .mtz-tooltip .t-cumpl.cumple  { color: #4ADE80; }
 .mtz-tooltip .t-cumpl.riesgo  { color: #FDE68A; }
 .mtz-tooltip .t-cumpl.critico { color: #FCA5A5; }
+
+/* ─── Globo de cálculo en composición ──────────────────── */
+/* ─── Tooltip de cálculo paso a paso ─────────────────────── */
+.calc-tooltip {
+  position: fixed;
+  z-index: 9999;
+  background: #0F172A;
+  color: white;
+  border-radius: 14px;
+  padding: 16px 18px;
+  max-width: 340px; min-width: 260px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.35), 0 4px 12px rgba(0,0,0,0.20);
+  font-size: 0.80rem;
+  pointer-events: auto;
+  animation: ctIn .15s cubic-bezier(.34,1.4,.64,1);
+}
+@keyframes ctIn { from { opacity:0; transform:translateY(6px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+/* Punta del tooltip */
+.calc-tooltip::after {
+  content: '';
+  position: absolute; bottom: -7px; left: 28px;
+  width: 14px; height: 14px;
+  background: #0F172A;
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+.calc-tooltip.above::after {
+  bottom: auto; top: -7px;
+  transform: rotate(45deg);
+}
+.ct-month  { font-size: 0.65rem; color: rgba(255,255,255,0.55); font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 6px; }
+.ct-formula{ font-family: "SF Mono",Menlo,Consolas,monospace; font-size: 0.74rem; color: rgba(255,255,255,0.70); background: rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 9px; margin-bottom: 10px; line-height: 1.5; }
+.ct-steps  { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.ct-step   { display: flex; align-items: flex-start; gap: 7px; font-size: 0.76rem; color: rgba(255,255,255,0.80); line-height: 1.45; }
+.ct-step-n { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; background: rgba(255,255,255,0.15); color: white; font-size: 0.58rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+.ct-step strong { color: white; }
+.ct-result {
+  display: flex; align-items: center; justify-content: space-between;
+  border-radius: 8px; padding: 8px 12px; margin-bottom: 8px;
+}
+.ct-result.cumple   { background: rgba(34,197,94,0.20); }
+.ct-result.riesgo   { background: rgba(245,158,11,0.20); }
+.ct-result.critico  { background: rgba(239,68,68,0.20); }
+.ct-result.pendiente{ background: rgba(255,255,255,0.08); }
+.ct-result-label { font-size: 0.74rem; font-weight: 600; }
+.ct-result-label.cumple   { color: #4ADE80; }
+.ct-result-label.riesgo   { color: #FDE68A; }
+.ct-result-label.critico  { color: #FCA5A5; }
+.ct-result-label.pendiente{ color: rgba(255,255,255,0.50); }
+.ct-result-pct { font-size: 1.20rem; font-weight: 900; letter-spacing: -0.02em; }
+.ct-result-pct.cumple   { color: #4ADE80; }
+.ct-result-pct.riesgo   { color: #FDE68A; }
+.ct-result-pct.critico  { color: #FCA5A5; }
+.ct-interp { font-size: 0.70rem; color: rgba(255,255,255,0.55); line-height: 1.5; font-style: italic; }
+.ct-close-hint { font-size: 0.64rem; color: rgba(255,255,255,0.35); margin-top: 8px; text-align: right; }
+.cumpl-clickable {
+  cursor: pointer; display: inline-block; transition: opacity .12s;
+}
+.cumpl-clickable:hover { opacity: 0.80; }
+/* Detalle de cálculo inline dentro de la tabla */
+.calc-inline-detail {
+  padding: 14px 20px; font-size: 0.78rem;
+  display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;
+}
+.cid-formula {
+  background: #EFF6FF; border-left: 3px solid var(--primary);
+  border-radius: 7px; padding: 8px 12px;
+  font-family: "SF Mono",Menlo,Consolas,monospace;
+  font-size: 0.74rem; color: #1E40AF; white-space: nowrap;
+}
+.cid-steps { display: flex; flex-direction: column; gap: 4px; }
+.cid-step  { display: flex; align-items: center; gap: 7px; color: var(--text-med); }
+.cid-step-n{ width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  background: var(--primary); color: white;
+  font-size: 0.58rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; }
+.cid-step strong { color: var(--text-dark); }
+.cid-result {
+  display: inline-flex; align-items: center; gap: 10px;
+  border-radius: 8px; padding: 8px 16px; font-weight: 700;
+}
+.cid-result.cumple   { background: #DCFCE7; color: #166534; }
+.cid-result.riesgo   { background: #FEF3C7; color: #92400E; }
+.cid-result.critico  { background: #FEE2E2; color: #991B1B; }
+.cid-result.pendiente{ background: #F1F5F9; color: #64748B; }
+.cid-result-pct { font-size: 1.15rem; font-weight: 900; }
+.cid-interp { font-size: 0.72rem; color: var(--text-lt); font-style: italic; margin-top: 4px; }
+/* Overlay invisible solo para cerrar */
+.calc-tooltip-overlay {
+  position: fixed; inset: 0; z-index: 9998; display: none;
+}
+.calc-tooltip-overlay.active { display: block; }
 
 /* ─── Perspectivas (debajo de la matriz) ─────────────────── */
 .section-title {
@@ -709,7 +826,8 @@ body {
 .ind-kpi-sub { font-size: 0.64rem; color: var(--text-lt); margin-top: 2px; }
 
 /* Mini chart */
-.chart-wrap { position: relative; height: 90px; margin: 0 16px 12px; }
+.chart-wrap { position: relative; height: 90px; margin: 0 16px 12px; pointer-events: none; }
+.chart-wrap canvas { pointer-events: none; }
 
 /* Metas por año (modo todos los años) */
 .ind-metas-yr {
@@ -751,6 +869,7 @@ body {
   margin: 0 14px 14px; padding: 9px 12px; border-radius: 10px;
   font-size: 0.78rem; font-weight: 600;
   display: flex; align-items: flex-start; gap: 8px; line-height: 1.4;
+  pointer-events: none;
 }
 .ind-alert.ok       { background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; }
 .ind-alert.warn     { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
@@ -1008,6 +1127,7 @@ body {
   </div>
 
   <div class="mtz-tooltip" id="mtz-tooltip"></div>
+  <div class="calc-tooltip-overlay" id="calc-tooltip-overlay"></div>
 
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
@@ -3175,7 +3295,7 @@ body {
               "meta": 0.05,
               "meta_raw": 0.05,
               "avg_result": 0.05713948043907929,
-              "cumplimiento": 0.8778998117874128,
+              "cumplimiento": 0.8572103912184141,
               "status": "riesgo",
               "n_months": 4
             },
@@ -3217,10 +3337,10 @@ body {
             }
           ],
           "trend": "down",
-          "accumulated": 0.9439254424579352,
+          "accumulated": 0.9405942937653535,
           "alert": {
             "level": "warn",
-            "text": "Atención en 2026: 88% de la meta"
+            "text": "Atención en 2026: 86% de la meta"
           },
           "warnings": [],
           "allowed_months": [
@@ -3238,7 +3358,7 @@ body {
             12
           ],
           "latest_status": "riesgo",
-          "latest_cumpl": 0.8778998117874128,
+          "latest_cumpl": 0.8572103912184141,
           "latest_year": 2026,
           "monthly_inputs": [
             {
@@ -14164,6 +14284,25 @@ const ICONS = {
 };
 
 // ── Formateo — estilo colombiano ─────────────────────────
+// Formatear una variable de entrada según el label (no el tipo del indicador)
+// Si el label contiene ($) → número en pesos colombianos (sin %)
+function fmtVar(v, label) {
+  if (v === null || v === undefined) return '—';
+  if (typeof v !== 'number' || !isFinite(v)) return String(v);
+  const lbl = (label || '').toLowerCase();
+  if (lbl.includes('($)') || lbl.includes('pesos') || lbl.includes('cop')) {
+    // Valor en pesos: separador de miles con punto, 2 decimales con coma
+    if (Math.abs(v) >= 1000000) return numCO(v / 1000000, 2) + ' M';
+    return '$ ' + numCO(v, 2);
+  }
+  if (lbl.includes('%') || lbl.includes('tasa') || lbl.includes('porcentaje')) {
+    return numCO(v * 100, 2) + '%';
+  }
+  // Default: número con 2 decimales
+  return numCO(v, 2);
+}
+
+// ── Formateo — estilo colombiano ─────────────────────────
 // Convierte número a string con punto como separador de miles y coma decimal
 function numCO(n, decimals) {
   if (n === null || n === undefined || isNaN(n)) return '—';
@@ -14255,7 +14394,8 @@ function monthCompliance(ind, yearIdx, monthIdx) {
   const tend = (ind.tend || '').toLowerCase().trim();
   let c;
   if (tend.startsWith('reducir') || tend.startsWith('disminuir') || tend.startsWith('bajar')) {
-    c = result > 0 ? meta / result : null;
+    // Método de desviación: 1 - (Resultado - Meta) / Meta
+    c = meta !== 0 ? 1.0 - (result - meta) / meta : null;
   } else if (tend.startsWith('mantener')) {
     c = meta !== 0 ? 1 - Math.abs(result - meta) / Math.abs(meta) : null;
   } else {
@@ -14372,35 +14512,7 @@ function renderFilters() {
       return n>0 ? sum/n : null;
     }
 
-    // "Todas" como primera tarjeta especial
-    const allActive = STATE.perspFilter === 'all';
-    const allCp = (() => {
-      let s=0,n=0;
-      getAllIndicators().forEach(({ind}) => {
-        const yr = effYear||CURRENT_YEAR;
-        const yObj=ind.yearly.find(y=>y.year===yr);
-        if(yObj&&yObj.cumplimiento!==null){s+=Math.min(yObj.cumplimiento,1.5);n++;}
-      });
-      return n>0?s/n:null;
-    })();
-    const allClr = pctToColor(allCp);
-    const allPct = allCp!==null?Math.round(allCp*100)+'%':'—';
-    const allBar = allCp!==null?Math.min(100,Math.max(0,allCp*100)):0;
-
-    let html = `<div class="persp-filter-card ${allActive?'active':''}" data-persp="all"
-         style="${allActive?`background:${hexA(allClr,0.06)};border-color:${allClr};`:''}">
-      <div class="pfc-icon" style="background:${hexA('#0876B2',0.12)};color:#0876B2">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      </div>
-      <div class="pfc-info">
-        <div class="pfc-name" style="${allActive?'color:#0876B2':''}">Todas</div>
-        <div class="pfc-count">${DATA.summary.total} indicadores</div>
-        <div class="pfc-pct" style="color:${allClr}">${allPct}</div>
-        <div class="pfc-bar"><div class="pfc-bar-fill" style="width:${allBar}%;background:${allClr}"></div></div>
-      </div>
-      ${allActive?`<div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:${allClr};border-radius:0 0 12px 12px;"></div>`:''}
-    </div>`;
-
+    let html = '';
     html += DATA.perspectives.map(p => {
       const cp = perspCumpl(p);
       const clr = pctToColor(cp);
@@ -14466,21 +14578,36 @@ function renderMatriz() {
   // Fila 2: meses
   let theadRow1 = '', theadRow2 = '';
   if (allYears) {
+    const nowM = new Date().getMonth();
     theadRow1 = `<tr>
-      <th class="mtz-th-ind" rowspan="2" style="vertical-align:bottom">Indicador</th>
-      ${yearsToShow.map(yr => `<th class="mtz-th-year" colspan="12">${yr}${yr===CURRENT_YEAR?' · actual':''}</th>`).join('')}
-      <th class="mtz-th-cumpl" rowspan="2" style="right:0;vertical-align:bottom">Cumpl.</th>
+      <th class="mtz-th-ind" rowspan="2" style="vertical-align:middle;padding-left:18px !important;font-size:0.70rem;font-weight:800;letter-spacing:0.08em;">
+        INDICADOR
+      </th>
+      ${yearsToShow.map(yr => `<th class="mtz-th-year ${yr===CURRENT_YEAR?'mtz-th-year-current':''}" colspan="12">
+        ${yr}${yr===CURRENT_YEAR?' ★ actual':''}
+      </th>`).join('')}
+      <th class="mtz-th-cumpl" rowspan="2" style="right:0;vertical-align:middle;font-size:0.62rem;font-weight:800;letter-spacing:0.06em;">
+        CUMPL.
+      </th>
     </tr>`;
+    const MFULL_A = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
     theadRow2 = `<tr>
       ${yearsToShow.map((yr,yi) => MONTH_ABBR.map((m,mi) =>
-        `<th class="${mi===0&&yi>0?'mtz-year-sep':''}">${m}</th>`
+        `<th class="mtz-th-mes ${(mi===0&&yi>0)?'mtz-year-sep':''} ${(yr===CURRENT_YEAR&&mi===nowM)?'current':''}">
+          <div class="mtz-th-mes-inner">
+            <span class="mtz-th-mes-abbr">${m}</span>
+            <span class="mtz-th-mes-full">${MFULL_A[mi]}</span>
+          </div>
+        </th>`
       ).join('')).join('')}
     </tr>`;
   } else {
+    const now = new Date();
+    const curMonthIdx = now.getMonth(); // 0-based
     theadRow2 = `<tr>
       <th class="mtz-th-ind">Indicador</th>
-      ${MONTH_ABBR.map(m=>`<th>${m}</th>`).join('')}
-      <th class="mtz-th-cumpl" style="right:0">Cumpl. ${singleYr}</th>
+      ${MONTH_ABBR.map((m,mi)=>`<th class="${mi===curMonthIdx&&singleYr===CURRENT_YEAR?'mtz-th-current':''}">${m}</th>`).join('')}
+      <th class="mtz-th-cumpl" style="right:0">Cumpl.<br>${singleYr}</th>
     </tr>`;
   }
 
@@ -14541,13 +14668,18 @@ function renderMatriz() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
   const totalCols = yearsToShow.length * 12;
-  const tableW = 220 + totalCols * 62 + 78;
+  const tableW = 240 + totalCols * 72 + 88;
 
   root.innerHTML = `
     <div class="matriz-layout">
       <div class="matriz-card">
         <div class="matriz-scroll">
-          <table class="matriz-table" style="width:${tableW}px">
+          <table class="matriz-table" style="width:100%;min-width:${tableW}px;--mtz-hdr:${
+            (() => {
+              const p = DATA.perspectives.find(p=>p.key===STATE.perspFilter);
+              return p ? p.accent : '#0657A4';
+            })()
+          };">
             <thead>
               ${theadRow1}
               ${theadRow2}
@@ -14635,8 +14767,20 @@ function renderPerspectives() {
       <div class="ind-grid">${cards}</div>
     </section>`;
   }).join('');
-  visiblePersps.forEach(p => p.indicators.forEach(ind => buildMiniChart(ind)));
-  root.querySelectorAll('.ind-card').forEach(card => card.addEventListener('click', () => openModal(card.dataset.code)));
+  // Registrar listener ANTES de buildMiniChart (que puede fallar si Chart.js no cargó)
+  root.removeEventListener('click', root._cardClickHandler);
+  root._cardClickHandler = (e) => {
+    const card = e.target.closest('.ind-card');
+    if (!card) return;
+    if (e.target.closest('button') || e.target.closest('a')) return;
+    openModal(card.dataset.code);
+  };
+  root.addEventListener('click', root._cardClickHandler);
+
+  // buildMiniChart en try/catch para que un fallo no bloquee lo anterior
+  visiblePersps.forEach(p => p.indicators.forEach(ind => {
+    try { buildMiniChart(ind); } catch(e) { /* Chart.js no disponible */ }
+  }));
 }
 
 function computePerspStats(persp) {
@@ -14694,10 +14838,10 @@ function renderCard(ind, persp, effYear) {
   };
   // Construir explicación de cómo se evalúa el cumplimiento de este indicador
   const tendExpl = tendLower.includes('reducir')||tendLower.includes('disminuir')
-    ? `Se evalúa como Meta÷Resultado: mientras más bajo el resultado respecto a la meta (${fmt(dyObj.meta_raw, ind.tipo_meta, ind.unidad)}), mejor el cumplimiento.`
+    ? `Método de desviación frente a la meta (${fmt(dyObj.meta_raw, ind.tipo_meta, ind.unidad)}): Cumplimiento = 100 − ((Resultado − Meta) / Meta × 100). Mientras menor sea el resultado vs la meta, mayor el cumplimiento.`
     : tendLower.includes('mantener')
-    ? `Se evalúa por proximidad a la meta (${fmt(dyObj.meta_raw, ind.tipo_meta, ind.unidad)}): 1 − |Resultado − Meta| / |Meta|. Entre más cercano a la meta, mayor cumplimiento.`
-    : `Se evalúa como Resultado÷Meta (${fmt(dyObj.meta_raw, ind.tipo_meta, ind.unidad)}): entre mayor sea el resultado respecto a la meta, mejor el cumplimiento.`;
+    ? `Se evalúa por proximidad a la meta (${fmt(dyObj.meta_raw, ind.tipo_meta, ind.unidad)}): Cumplimiento = 1 − |Resultado − Meta| / Meta. Entre más cercano a la meta, mayor el cumplimiento.`
+    : `Se evalúa como Resultado ÷ Meta (${fmt(dyObj.meta_raw, ind.tipo_meta, ind.unidad)}): entre mayor sea el resultado respecto a la meta, mejor el cumplimiento.`;
 
   const alertSubs = {
     ok:       tendExpl,
@@ -15062,11 +15206,22 @@ function openModal(code) {
   overlay.addEventListener('click', e => { if(e.target===overlay) closeModal(); });
 
   // Sección composición del cálculo (renderizada después del chart)
+  // Chart y composición en bloques independientes para evitar que un fallo en uno bloquee el otro
   setTimeout(() => {
-    buildDetailChart(ind, color);
+    try { buildDetailChart(ind, color); } catch(e) { console.warn('Chart.js no disponible:', e.message); }
+  }, 80);
+
+  setTimeout(() => {
     const compEl = document.getElementById('modal-composicion');
-    if (compEl) compEl.innerHTML = buildComposicion(ind);
-  }, 50);
+    if (!compEl) return;
+    try {
+      compEl.innerHTML = buildComposicion(ind);
+      requestAnimationFrame(() => attachComposicionBubbles(ind));
+    } catch(e) {
+      compEl.innerHTML = '<div style="padding:16px;color:var(--text-lt)">No se pudo cargar la composición.</div>';
+      console.warn('buildComposicion error:', e);
+    }
+  }, 100);
 }
 
 function buildDetailChart(ind, color) {
@@ -15385,7 +15540,7 @@ function buildComposicion(ind) {
     const tend   = (ind.tend||'').toLowerCase();
     let cumpl = null;
     if (result !== null && typeof meta === 'number') {
-      if (tend.includes('reducir')||tend.includes('disminuir')) cumpl = result>0?meta/result:null;
+      if (tend.includes('reducir')||tend.includes('disminuir')) cumpl = meta!==0?1.0-(result-meta)/meta:null;
       else if (tend.includes('mantener')) cumpl = meta!==0?1-Math.abs(result-meta)/Math.abs(meta):null;
       else cumpl = meta!==0?result/meta:null;
     }
@@ -15397,7 +15552,7 @@ function buildComposicion(ind) {
       <td>${MONTH_NAMES[mi]}</td>
       ${ind.vars.map(v=>{
         const val = rec[v.code];
-        return `<td style="text-align:center">${val!==null&&val!==undefined?fmt(val,ind.tipo_meta,ind.unidad):'—'}</td>`;
+        return `<td style="text-align:center">${val!==null&&val!==undefined?fmtVar(val,v.label):'—'}</td>`;
       }).join('')}
       <td style="text-align:center;background:var(--surface-3);font-weight:700">
         ${result!==null?fmt(result,ind.tipo_meta,ind.unidad):'—'}
@@ -15405,10 +15560,24 @@ function buildComposicion(ind) {
       <td style="text-align:center;background:var(--surface-3)">
         ${typeof meta==='number'?fmt(meta,ind.tipo_meta,ind.unidad):'—'}
       </td>
-      <td style="text-align:center;background:var(--surface-3);font-weight:800;color:${stColor}">
-        ${cumpl!==null?numCO(cumpl*100,0)+'%':'—'}
+      <td style="text-align:center;background:var(--surface-3)">
+        <span class="cumpl-clickable" style="font-weight:800;color:${stColor};cursor:pointer;border-bottom:2px dashed ${stColor};padding-bottom:1px;"
+              data-row-id="cr-${i}-${mi}"
+              data-result="${result}"
+              data-meta="${meta}"
+              data-cumpl="${cumpl}"
+              data-month="${MONTH_NAMES[mi]} ${rec.year}">
+          ${cumpl!==null?numCO(cumpl*100,0)+'%':'—'}
+        </span>
       </td>
-    </tr>`;
+    </tr>
+    <tr id="cr-${i}-${mi}-detail" style="display:none">
+      <td colspan="${2 + ind.vars.length + 4}"
+          style="padding:0;background:#F8FAFC;border-bottom:1px solid var(--border);">
+        <div class="calc-inline-detail" id="cr-${i}-${mi}-box"></div>
+      </td>
+    </tr>
+  `;
   }).join('');
 
   // Descripción de variables
@@ -15423,14 +15592,204 @@ function buildComposicion(ind) {
     }).join('')}
   </div>`;
 
-  return `
+  const html = `
     ${varDesc}
     <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border)">
       <table class="tabla" style="font-size:0.76rem">
         <thead>${thead}</thead>
         <tbody>${tbody}</tbody>
       </table>
+    </div>
+    <div style="margin-top:8px;font-size:0.70rem;color:var(--text-lt);display:flex;align-items:center;gap:5px">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      Pulsa sobre cualquier valor de cumplimiento para ver el cálculo detallado paso a paso.
     </div>`;
+
+  // Necesitamos retornar el html y luego attachar los eventos
+  // Lo hacemos con un container y un timeout
+  return html;
+}
+
+// Attachar eventos de burbuja de cálculo en la sección de composición
+function attachComposicionBubbles(ind) {
+  const container = document.getElementById('modal-composicion');
+  if (!container) return;
+
+  container.querySelectorAll('.cumpl-clickable').forEach(span => {
+    span.addEventListener('click', e => {
+      e.stopPropagation();
+      const rowId  = span.dataset.rowId;
+      const result = parseFloat(span.dataset.result);
+      const meta   = parseFloat(span.dataset.meta);
+      const cumpl  = span.dataset.cumpl === 'null' || !span.dataset.cumpl ? null : parseFloat(span.dataset.cumpl);
+      const month  = span.dataset.month;
+      const detailRow = document.getElementById(rowId + '-detail');
+      const detailBox = document.getElementById(rowId + '-box');
+
+      // Toggle: si ya está abierto, cerrar
+      if (detailRow && detailRow.style.display !== 'none') {
+        detailRow.style.display = 'none';
+        span.style.background = '';
+        return;
+      }
+
+      // Cerrar cualquier otro abierto
+      container.querySelectorAll('tr[id$="-detail"]').forEach(r => r.style.display = 'none');
+      container.querySelectorAll('.cumpl-clickable').forEach(s => s.style.background = '');
+
+      if (!detailRow || !detailBox) return;
+
+      // Construir contenido
+      const { formulaLine, steps, interp, pct, st } = buildCalcExplanation(ind, result, meta, cumpl, month);
+      const stLbl = {cumple:'✓ En meta', riesgo:'⚠ En riesgo', critico:'✗ Crítico', pendiente:'Sin datos'}[st];
+
+      detailBox.innerHTML = `
+        <div class="cid-formula">${escapeHTML(formulaLine)}</div>
+        <div class="cid-steps">
+          ${steps.map((s,i) => `<div class="cid-step"><div class="cid-step-n">${i+1}</div><div>${s}</div></div>`).join('')}
+        </div>
+        <div class="cid-result ${st}">
+          <span>${stLbl}</span>
+          <span class="cid-result-pct">${pct}</span>
+        </div>
+        <div style="flex-basis:100%"><div class="cid-interp">${escapeHTML(interp)}</div></div>
+      `;
+
+      detailRow.style.display = '';
+      // Highlight del span activo
+      const stBg = {cumple:'#DCFCE7', riesgo:'#FEF3C7', critico:'#FEE2E2', pendiente:'#F1F5F9'}[st];
+      span.style.background = stBg;
+      span.style.borderRadius = '4px';
+      span.style.padding = '2px 5px';
+
+      // Scroll suave a la fila de detalle
+      detailRow.scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+  });
+}
+
+// ── Globo explicativo de cálculo ─────────────────────────
+function buildCalcExplanation(ind, result, meta, cumpl, monthLabel) {
+  const tend = (ind.tend||'').toLowerCase();
+  const isReducir  = tend.includes('reducir') || tend.includes('disminuir');
+  const isMantener = tend.includes('mantener');
+  const r = fmt(result, ind.tipo_meta, ind.unidad);
+  const m = fmt(meta,   ind.tipo_meta, ind.unidad);
+  const pct = cumpl !== null ? numCO(cumpl * 100, 2) + '%' : '—';
+  const st  = cumpl === null ? 'pendiente' : cumpl >= 0.95 ? 'cumple' : cumpl >= 0.80 ? 'riesgo' : 'critico';
+  const stLabel = { cumple:'En meta ✓', riesgo:'En riesgo ⚠', critico:'Crítico ✗', pendiente:'Sin datos' }[st];
+
+  let formulaLine, steps, interp;
+
+  if (isReducir) {
+    // 1 - (Resultado - Meta) / Meta
+    const dev   = result - meta;
+    const devPct = meta !== 0 ? dev / meta : 0;
+    formulaLine = `Cumpl = 1 − (Resultado − Meta) / Meta`;
+    steps = [
+      `Desviación = ${r} − ${m} = <strong>${fmt(dev, ind.tipo_meta, ind.unidad)}</strong>`,
+      `Ratio = ${fmt(dev, ind.tipo_meta, ind.unidad)} ÷ ${m} = <strong>${numCO(devPct * 100, 2)}%</strong>`,
+      `Cumplimiento = 100% − ${numCO(devPct * 100, 2)}% = <strong>${pct}</strong>`,
+    ];
+    const exceso = numCO(Math.abs(devPct) * 100, 2);
+    interp = cumpl !== null && cumpl < 1
+      ? `El resultado superó la meta en ${exceso}%, lo que reduce el cumplimiento a ${pct}.`
+      : cumpl !== null && cumpl >= 1
+      ? `El resultado está por debajo de la meta — cumplimiento del ${pct}.`
+      : 'Sin datos para calcular.';
+  } else if (isMantener) {
+    const absDev = Math.abs(result - meta);
+    const ratio  = meta !== 0 ? absDev / Math.abs(meta) : 0;
+    formulaLine = `Cumpl = 1 − |Resultado − Meta| / |Meta|`;
+    steps = [
+      `Desviación absoluta = |${r} − ${m}| = <strong>${fmt(absDev, ind.tipo_meta, ind.unidad)}</strong>`,
+      `Ratio = ${fmt(absDev, ind.tipo_meta, ind.unidad)} ÷ ${m} = <strong>${numCO(ratio * 100, 2)}%</strong>`,
+      `Cumplimiento = 100% − ${numCO(ratio * 100, 2)}% = <strong>${pct}</strong>`,
+    ];
+    interp = `Se aleja de la meta en ${numCO(ratio * 100, 2)}%. Cumplimiento: ${pct}.`;
+  } else {
+    // Crecer: Resultado / Meta
+    const ratio = meta !== 0 ? result / meta : 0;
+    formulaLine = `Cumpl = Resultado ÷ Meta`;
+    steps = [
+      `Resultado obtenido: <strong>${r}</strong>`,
+      `Meta del período: <strong>${m}</strong>`,
+      `Cumplimiento = ${r} ÷ ${m} = <strong>${pct}</strong>`,
+    ];
+    interp = result >= meta
+      ? `El resultado supera o iguala la meta. Cumplimiento: ${pct}.`
+      : `El resultado está por debajo de la meta en ${numCO((1 - ratio) * 100, 2)}%.`;
+  }
+
+  return { formulaLine, steps, interp, pct, st, stLabel };
+}
+
+function showCalcTooltip(ind, result, meta, cumpl, monthLabel, anchorEl) {
+  // Cerrar cualquier tooltip abierto
+  closeCalcTooltip();
+
+  if (result === null || result === undefined) return;
+
+  const { formulaLine, steps, interp, pct, st } = buildCalcExplanation(ind, result, meta, cumpl, monthLabel);
+  const stLabels = { cumple:'✓ En meta', riesgo:'⚠ En riesgo', critico:'✗ Crítico', pendiente:'Sin datos' };
+
+  const tip = document.createElement('div');
+  tip.className = 'calc-tooltip';
+  tip.id = 'calc-tooltip-el';
+  tip.innerHTML = `
+    <div class="ct-month">${escapeHTML(monthLabel)}</div>
+    <div class="ct-formula">${escapeHTML(formulaLine)}</div>
+    <div class="ct-steps">
+      ${steps.map((s,i) => `<div class="ct-step"><div class="ct-step-n">${i+1}</div><div>${s}</div></div>`).join('')}
+    </div>
+    <div class="ct-result ${st}">
+      <span class="ct-result-label ${st}">${stLabels[st]||''}</span>
+      <span class="ct-result-pct ${st}">${pct}</span>
+    </div>
+    <div class="ct-interp">${escapeHTML(interp)}</div>
+    <div class="ct-close-hint">Clic fuera para cerrar</div>
+  `;
+
+  document.body.appendChild(tip);
+
+  // Posicionar encima o debajo del elemento
+  const rect  = anchorEl.getBoundingClientRect();
+  const tw    = 320;
+  const th    = tip.offsetHeight || 220;
+  let   left  = rect.left + rect.width/2 - tw/2;
+  const spaceBelow = window.innerHeight - rect.bottom - 12;
+  const spaceAbove = rect.top - 12;
+  let   top, above = false;
+
+  if (spaceBelow >= th || spaceBelow >= spaceAbove) {
+    top = rect.bottom + window.scrollY + 10;
+  } else {
+    top = rect.top + window.scrollY - th - 10;
+    above = true;
+    tip.classList.add('above');
+  }
+
+  left = Math.max(12, Math.min(left, window.innerWidth - tw - 12));
+  tip.style.left  = left + 'px';
+  tip.style.top   = top + 'px';
+  tip.style.width = tw + 'px';
+
+  // Overlay invisible para cerrar
+  const ov = document.getElementById('calc-tooltip-overlay');
+  ov.classList.add('active');
+  ov.onclick = () => closeCalcTooltip();
+}
+
+function closeCalcTooltip() {
+  const existing = document.getElementById('calc-tooltip-el');
+  if (existing) existing.remove();
+  const ov = document.getElementById('calc-tooltip-overlay');
+  if (ov) { ov.classList.remove('active'); ov.onclick = null; }
+}
+
+// Alias para compatibilidad
+function showCalcBubble(ind, result, meta, cumpl, monthLabel, anchorEl) {
+  showCalcTooltip(ind, result, meta, cumpl, monthLabel, anchorEl);
 }
 
 // ── Exportar indicador individual ─────────────────────────
@@ -15572,7 +15931,7 @@ function setRef(ws, rows, cols) {
 function calcCumpl(result, meta, tend) {
   if (result===null||result===undefined||typeof meta!=='number') return null;
   const t = (tend||'').toLowerCase();
-  if (t.includes('reducir')||t.includes('disminuir')) return result>0 ? meta/result : null;
+  if (t.includes('reducir')||t.includes('disminuir')) return meta!==0 ? 1.0-(result-meta)/meta : null;
   if (t.includes('mantener')) return meta!==0 ? 1-Math.abs(result-meta)/Math.abs(meta) : null;
   return meta!==0 ? result/meta : null;
 }
@@ -15707,18 +16066,81 @@ function buildIndSheet(ind, pal) {
     wc(ws, r, 1, cs(['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][mi], sVal(bg)));
     wc(ws, r, 2, cn(mi+1, sNum(bg)));
 
-    // Variables de entrada
+    // Variables de entrada — formato según label
     ind.vars.forEach((v,vi) => {
       const val = rec[v.code];
-      wc(ws, r, 3+vi, val!=null ? cn(val, sNum(bg)) : cs('—', {...sNum(bg), font:{sz:10,color:{rgb:'94A3B8'},name:'Calibri'}}));
+      if (val == null) {
+        wc(ws, r, 3+vi, cs('—', {...sNum(bg), font:{sz:10,color:{rgb:'94A3B8'},name:'Calibri'}}));
+      } else {
+        const lbl = (v.label||'').toLowerCase();
+        const isDollar = lbl.includes('($)') || lbl.includes('pesos') || lbl.includes('cop');
+        const z = isDollar ? '#,##0.00' : (lbl.includes('%') ? '0.00%' : '#,##0.00');
+        wc(ws, r, 3+vi, cn(val, sNum(bg), z));
+      }
     });
 
     // Resultado
     wc(ws, r, 3+nVars, result!=null ? cn(result, {...sNum(bg), font:{bold:true,sz:10,color:{rgb:hexXL(pal.accent)},name:'Calibri'}}) : cs('—', {...sNum(bg), font:{sz:10,color:{rgb:'94A3B8'},name:'Calibri'}}));
     // Meta
     wc(ws, r, 3+nVars+1, typeof meta==='number' ? cn(meta, sNum(bg)) : cs('—', {...sNum(bg), font:{sz:10,color:{rgb:'94A3B8'},name:'Calibri'}}));
-    // Cumplimiento
-    wc(ws, r, 3+nVars+2, cumpl!=null ? cpct(cumpl, sPct(cumpl)) : cs('—', sPct(null)));
+    // Cumplimiento + comentario explicativo del cálculo
+    const cumplCell = cumpl!=null ? cpct(cumpl, sPct(cumpl)) : cs('—', sPct(null));
+
+    // Construir texto del comentario según tendencia
+    if (cumpl !== null && result !== null && typeof meta === 'number') {
+      const tend_c = (ind.tend||'').toLowerCase();
+      const fmtR = typeof result === 'number' ? result.toFixed(4) : String(result);
+      const fmtM = meta.toFixed(4);
+      let comentario = '';
+      if (tend_c.includes('reducir') || tend_c.includes('disminuir')) {
+        const dev    = result - meta;
+        const devPct = meta !== 0 ? dev / meta : 0;
+        comentario = [
+          `📐 CÁLCULO DE CUMPLIMIENTO`,
+          `Fórmula: 1 − (Resultado − Meta) / Meta`,
+          ``,
+          `Paso 1: Desviación = ${fmtR} − ${fmtM} = ${dev.toFixed(4)}`,
+          `Paso 2: Ratio = ${dev.toFixed(4)} ÷ ${fmtM} = ${(devPct*100).toFixed(2)}%`,
+          `Paso 3: Cumplimiento = 100% − ${(devPct*100).toFixed(2)}% = ${(cumpl*100).toFixed(2)}%`,
+          ``,
+          `Estado: ${stLabel}`,
+          ``,
+          `Interpretación: El resultado ${result > meta ? 'supera' : 'está por debajo de'} la meta.`,
+          result > meta
+            ? `Se excede en ${((result-meta)/meta*100).toFixed(2)}%, reduciendo el cumplimiento.`
+            : `Está ${((meta-result)/meta*100).toFixed(2)}% por debajo → excelente cumplimiento.`,
+        ].join('\n');
+      } else if (tend_c.includes('mantener')) {
+        const absDev = Math.abs(result - meta);
+        const ratio  = meta !== 0 ? absDev / Math.abs(meta) : 0;
+        comentario = [
+          `📐 CÁLCULO DE CUMPLIMIENTO`,
+          `Fórmula: 1 − |Resultado − Meta| / |Meta|`,
+          ``,
+          `Paso 1: Desviación absoluta = |${fmtR} − ${fmtM}| = ${absDev.toFixed(4)}`,
+          `Paso 2: Ratio = ${absDev.toFixed(4)} ÷ ${fmtM} = ${(ratio*100).toFixed(2)}%`,
+          `Paso 3: Cumplimiento = 100% − ${(ratio*100).toFixed(2)}% = ${(cumpl*100).toFixed(2)}%`,
+          ``,
+          `Estado: ${stLabel}`,
+        ].join('\n');
+      } else {
+        // Crecer
+        comentario = [
+          `📐 CÁLCULO DE CUMPLIMIENTO`,
+          `Fórmula: Resultado ÷ Meta`,
+          ``,
+          `Paso 1: Resultado = ${fmtR}`,
+          `Paso 2: Meta = ${fmtM}`,
+          `Paso 3: Cumplimiento = ${fmtR} ÷ ${fmtM} = ${(cumpl*100).toFixed(2)}%`,
+          ``,
+          `Estado: ${stLabel}`,
+          `Interpretación: ${result >= meta ? 'El resultado alcanza o supera la meta.' : `Falta ${((1-cumpl)*100).toFixed(2)}% para alcanzar la meta.`}`,
+        ].join('\n');
+      }
+      if (comentario) cumplCell['c'] = [{ a: 'Dashboard FEBOR', t: comentario }];
+    }
+
+    wc(ws, r, 3+nVars+2, cumplCell);
     // Estado
     wc(ws, r, 3+nVars+3, cs(stLabel, sStat(stLabel)));
 
