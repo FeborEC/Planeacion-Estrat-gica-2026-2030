@@ -448,6 +448,35 @@ body {
 .mtz-ind-name { font-size: 0.82rem; font-weight: 600; color: var(--text-dark); line-height: 1.3; white-space: normal; }
 .mtz-ind-formula { font-size: 0.62rem; color: var(--text-lt); font-style: italic; margin-top: 3px; line-height: 1.3; white-space: normal; }
 
+/* Columna META anual */
+.mtz-th-meta {
+  width: 62px; min-width: 62px; max-width: 62px;
+  background: #0D47A1 !important;
+  padding: 5px 3px !important;
+  font-size: 0.58rem; font-weight: 800; letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.95); text-align: center;
+  vertical-align: middle; overflow: hidden;
+  border-left: 2px solid rgba(255,255,255,0.30) !important;
+  border-right: 1px solid rgba(255,255,255,0.15) !important;
+  line-height: 1.3;
+}
+.mtz-meta-cell {
+  width: 62px; min-width: 62px; max-width: 62px;
+  text-align: center; padding: 4px 3px !important;
+  vertical-align: middle;
+  border-left: 2px solid #BFDBFE !important;
+  border-right: 1px solid var(--border) !important;
+  background: #EFF6FF;
+}
+.mtz-meta-val {
+  font-size: 0.68rem; font-weight: 700; color: #1D4ED8;
+  white-space: nowrap;
+}
+/* Responsive móvil: ocultar meta */
+@media (max-width: 480px) {
+  .mtz-th-meta, .mtz-meta-cell { display: none; }
+}
+
 /* Columna tendencia */
 .mtz-th-tend {
   width: 80px; min-width: 80px; max-width: 80px;
@@ -522,6 +551,7 @@ body {
   position: sticky; top: 0; z-index: 70;
   background: var(--bg);
   box-shadow: 0 2px 12px rgba(15,23,42,0.07);
+  transition: top 0.1s;
 }
 .gauges-section { margin-bottom: 0; }
 
@@ -15499,23 +15529,29 @@ function renderMatriz() {
     theadRow1 = `<tr>
       <th class="mtz-th-ind" rowspan="2" style="vertical-align:middle;text-align:center;font-size:0.70rem;font-weight:800;letter-spacing:0.08em;">INDICADOR</th>
       <th class="mtz-th-tend" rowspan="2" style="vertical-align:middle;text-align:center;font-size:0.58rem;font-weight:700;letter-spacing:0.04em;line-height:1.3;">TEND.<br>ESPERADA</th>
-      ${yearsToShow.map(yr => `<th class="mtz-th-year ${yr===CURRENT_YEAR?'mtz-th-year-current':''}" colspan="12">
-        ${yr}${yr===CURRENT_YEAR?' ★ actual':''}
-      </th>`).join('')}
-      <th class="mtz-th-cumpl" rowspan="2" style="right:0;vertical-align:middle;font-size:0.62rem;font-weight:800;letter-spacing:0.06em;">
+      ${yearsToShow.map(yr => `
+        <th class="mtz-th-meta" style="font-size:0.56rem;line-height:1.2;">META<br>${yr}</th>
+        <th class="mtz-th-year ${yr===CURRENT_YEAR?'mtz-th-year-current':''}" colspan="12">
+          ${yr}${yr===CURRENT_YEAR?' ★ actual':''}
+        </th>`).join('')}
+      <th class="mtz-th-cumpl" style="right:0;vertical-align:middle;font-size:0.62rem;font-weight:800;letter-spacing:0.06em;position:sticky;z-index:11;">
         CUMPL.
       </th>
     </tr>`;
     const MFULL_A = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
     theadRow2 = `<tr>
-      ${yearsToShow.map((yr,yi) => MONTH_ABBR.map((m,mi) =>
-        `<th class="mtz-th-mes ${(mi===0&&yi>0)?'mtz-year-sep':''} ${(yr===CURRENT_YEAR&&mi===nowM)?'current':''}">
-          <div class="mtz-th-mes-inner">
-            <span class="mtz-th-mes-abbr">${m}</span>
-            <span class="mtz-th-mes-full">${MFULL_A[mi]}</span>
-          </div>
-        </th>`
-      ).join('')).join('')}
+      ${yearsToShow.map((yr,yi) => {
+        const mesCells = MONTH_ABBR.map((m,mi) =>
+          `<th class="mtz-th-mes ${(yr===CURRENT_YEAR&&mi===nowM)?'current':''}">
+            <div class="mtz-th-mes-inner">
+              <span class="mtz-th-mes-abbr">${m}</span>
+              <span class="mtz-th-mes-full">${MFULL_A[mi]}</span>
+            </div>
+          </th>`
+        ).join('');
+        return `<td style="background:#0D47A1;border:none;width:62px;min-width:62px;"></td>${mesCells}`;
+      }).join('')}
+      <th class="mtz-th-cumpl" style="right:0;position:sticky;z-index:11;font-size:0;border-top:none;"></th>
     </tr>`;
   } else {
     const now = new Date();
@@ -15524,6 +15560,7 @@ function renderMatriz() {
     theadRow2 = `<tr>
       <th class="mtz-th-ind" style="vertical-align:middle;text-align:center;font-size:0.70rem;font-weight:800;letter-spacing:0.08em;">INDICADOR</th>
       <th class="mtz-th-tend" style="vertical-align:middle;text-align:center;font-size:0.58rem;font-weight:700;letter-spacing:0.04em;line-height:1.3;">TEND.<br>ESPERADA</th>
+      <th class="mtz-th-meta">META<br>${singleYr}</th>
       ${MONTH_ABBR.map((m,mi)=>`<th class="mtz-th-mes ${mi===curMonthIdx&&singleYr===CURRENT_YEAR?'current':''}">
         <div class="mtz-th-mes-inner">
           <span class="mtz-th-mes-abbr">${m}</span>
@@ -15547,14 +15584,21 @@ function renderMatriz() {
       let monthCells = '';
       yearsToShow.forEach((yr, yi) => {
         const yIdx = yr - 2026;
+        // ── Celda META del año (antes de los 12 meses) ──────────────
+        const metaYr = ind.metas[yIdx];
+        const metaYrFmt = (metaYr !== null && typeof metaYr === 'number')
+          ? fmt(metaYr, ind.tipo_meta, ind.unidad) : '—';
+        monthCells += `<td class="mtz-meta-cell">
+          <div class="mtz-meta-val">${metaYrFmt}</div>
+        </td>`;
+        // ── 12 meses del año ─────────────────────────────────────────
         for (let m = 0; m < 12; m++) {
           const mc = monthCompliance(ind, yIdx, m);
           const resultFmt = mc.result!==null ? fmt(mc.result,ind.tipo_meta,ind.unidad) : '—';
           const metaFmt = (ind.metas[yIdx]!==null&&typeof ind.metas[yIdx]==='number') ? fmt(ind.metas[yIdx],ind.tipo_meta,ind.unidad) : '—';
           const cumplFmt = mc.cumpl!==null ? (mc.cumpl*100).toFixed(0)+'%' : '—';
           const dispVal  = mc.result!==null ? fmtMtz(mc.result,ind.tipo_meta,ind.unidad) : '–';
-          const sepClass = (m===0&&yi>0) ? 'mtz-year-sep' : '';
-          monthCells += `<td class="mtz-month-cell ${sepClass}">
+          monthCells += `<td class="mtz-month-cell">
             <div class="mtz-light ${mc.status}"
                  data-month="${MONTH_ABBR[m]} ${yr}" data-result="${escapeHTML(resultFmt)}"
                  data-meta="${escapeHTML(metaFmt)}" data-cumpl="${cumplFmt}"
@@ -15605,7 +15649,7 @@ function renderMatriz() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
   const totalCols = yearsToShow.length * 12;
-  const tableW = 240 + 80 + totalCols * 72 + 88;  // +80 col tendencia
+  const tableW = 240 + 80 + yearsToShow.length * (62 + 12*72) + 88;  // ind+tend+meta_por_año+cumpl
 
   root.innerHTML = `
     <div class="matriz-layout">
@@ -15945,6 +15989,156 @@ function renderCard(ind, persp, effYear) {
   </div>`;
 }
 
+
+// ─── Función reutilizable de etiquetas inteligentes intercaladas ────────
+function drawSmartLabels(chart, data, color, fmt_fn, tipo_meta, unidad, opts) {
+  const meta0 = chart.getDatasetMeta(0);
+  const {ctx: c} = chart;
+  const area  = chart.chartArea;
+  opts = opts || {};
+  const FONT_SZ  = opts.fontSize  || 10;
+  const LBL_H    = opts.lblH      || (FONT_SZ + 7);
+  const LBL_PAD  = opts.lblPad    || 6;
+  const MAX_LBL  = opts.maxLabels || 8;   // máximo etiquetas totales
+  const MIN_PX_GAP = opts.minGap  || 44;  // px mínimo entre etiquetas en X
+
+  const realIdxs = data.map((v,i)=>v!==null?i:-1).filter(i=>i>=0);
+  if (!realIdxs.length) return;
+
+  c.font = `700 ${FONT_SZ}px sans-serif`;
+
+  // ── Paso 1: candidatos por prioridad ────────────────────────────
+  const maxI  = realIdxs.reduce((a,b)=>data[a]>=data[b]?a:b);
+  const minI  = realIdxs.reduce((a,b)=>data[a]<=data[b]?a:b);
+  const first = realIdxs[0], last = realIdxs[realIdxs.length-1];
+
+  // Inflexiones (picos/valles locales)
+  const inflect = [];
+  for (let k=1; k<realIdxs.length-1; k++) {
+    const [pi,ci,ni] = [realIdxs[k-1], realIdxs[k], realIdxs[k+1]];
+    const [pv,cv,nv] = [data[pi], data[ci], data[ni]];
+    if (pv!==null && cv!==null && nv!==null &&
+        ((cv>pv && cv>nv) || (cv<pv && cv<nv))) inflect.push(ci);
+  }
+
+  // Si hay pocos puntos, mostrarlos todos; si hay muchos, selección por separación X
+  let selected;
+  if (realIdxs.length <= MAX_LBL) {
+    selected = [...realIdxs];
+  } else {
+    // Selección uniforme: tomar uno cada N puntos + siempre first/last/max/min
+    const must = new Set([first, last, maxI, minI]);
+    const step = Math.ceil(realIdxs.length / (MAX_LBL - must.size));
+    for (let k=0; k<realIdxs.length; k+=step) must.add(realIdxs[k]);
+    selected = [...must].sort((a,b)=>a-b);
+    // Filtrar por separación mínima en X (greedy sobre los ya ordenados)
+    const filtered = [selected[0]];
+    for (let k=1; k<selected.length; k++) {
+      const ptA = meta0.data[filtered[filtered.length-1]];
+      const ptB = meta0.data[selected[k]];
+      if (ptA && ptB && ptB.x - ptA.x >= MIN_PX_GAP) filtered.push(selected[k]);
+      else if (selected[k] === last || selected[k] === maxI || selected[k] === minI) {
+        // Siempre incluir max/min/last aunque estén cerca — reemplazar el vecino
+        filtered[filtered.length-1] = selected[k];
+      }
+    }
+    selected = filtered;
+  }
+  if (!selected.length) return;
+
+  // ── Paso 2: construir objetos label con posición intercalada ───────
+  // Intercalar arriba/abajo: par→arriba, impar→abajo
+  const labels = selected.map((i, idx) => {
+    const pt  = meta0.data[i];
+    if (!pt) return null;
+    const v   = data[i];
+    const txt = fmt_fn(v, tipo_meta, unidad);
+    const tw  = c.measureText(txt).width + LBL_PAD * 2;
+    const above = (idx % 2 === 0);  // intercalado
+    const cy_init = above
+      ? pt.y - LBL_H - 6        // encima del punto
+      : pt.y + 8;                // debajo del punto
+    return { i, pt, txt, w: tw, h: LBL_H, cx: pt.x,
+             cy: cy_init, above, anchor: pt.y };
+  }).filter(Boolean);
+
+  // ── Paso 3: anti-colisión vertical (solo dentro del mismo lado) ───
+  for (let iter=0; iter<30; iter++) {
+    let moved = false;
+    for (let a=0; a<labels.length; a++) {
+      for (let b=a+1; b<labels.length; b++) {
+        const la=labels[a], lb=labels[b];
+        const xOver = Math.abs(la.cx-lb.cx) < (la.w+lb.w)/2 + 3;
+        const yOver = Math.abs(la.cy-lb.cy) < la.h + 3;
+        if (xOver && yOver) {
+          const push = (la.h + 3 - Math.abs(la.cy-lb.cy))/2 + 1;
+          if (la.cy <= lb.cy) { la.cy -= push; lb.cy += push; }
+          else                { la.cy += push; lb.cy -= push; }
+          moved = true;
+        }
+      }
+    }
+    if (!moved) break;
+  }
+
+  // Clamp al área
+  labels.forEach(lb => {
+    const topLimit  = area.top + 2;
+    const botLimit  = area.bottom - lb.h - 2;
+    lb.cy = Math.max(topLimit, Math.min(botLimit, lb.cy));
+  });
+
+  // ── Paso 4: dibujar línea guía + caja + texto ─────────────────────
+  labels.forEach(lb => {
+    const {pt, txt, cx, cy, w, h, above} = lb;
+    c.save();
+
+    // Línea guía del label al punto
+    const lineTop    = above ? cy + h + 1 : cy - 1;
+    const lineBottom = above ? pt.y - 4   : pt.y + 4;
+    if (Math.abs(lineTop - lineBottom) > 6) {
+      c.beginPath();
+      c.moveTo(cx, lineTop);
+      c.lineTo(cx, lineBottom);
+      c.strokeStyle = hexA(color, 0.28);
+      c.lineWidth   = 1;
+      c.setLineDash([2,3]);
+      c.stroke();
+      c.setLineDash([]);
+    }
+
+    // Punto de anclaje en la curva
+    c.beginPath();
+    c.arc(pt.x, pt.y, 3, 0, Math.PI*2);
+    c.fillStyle = color;
+    c.fill();
+    c.strokeStyle = 'white';
+    c.lineWidth = 1.5;
+    c.stroke();
+
+    // Caja con sombra sutil
+    c.shadowColor = 'rgba(0,0,0,0.10)';
+    c.shadowBlur  = 4;
+    c.fillStyle   = 'white';
+    c.beginPath();
+    c.roundRect(cx - w/2, cy, w, h, 4);
+    c.fill();
+    c.shadowBlur  = 0;
+    c.strokeStyle = hexA(color, 0.40);
+    c.lineWidth   = 1;
+    c.stroke();
+
+    // Texto
+    c.fillStyle    = color;
+    c.font         = `700 ${FONT_SZ}px sans-serif`;
+    c.textAlign    = 'center';
+    c.textBaseline = 'middle';
+    c.fillText(txt, cx, cy + h/2);
+
+    c.restore();
+  });
+}
+
 function buildMiniChart(ind) {
   const ctx = document.getElementById('chart-'+ind.code);
   if (!ctx) return;
@@ -15992,6 +16186,14 @@ function buildMiniChart(ind) {
     }
   };
 
+  const miniSmartLabels = {
+    id: 'miniSmartLabels',
+    afterDatasetsDraw(chart) {
+      drawSmartLabels(chart, chart.data.datasets[0].data, color, fmt, ind.tipo_meta, ind.unidad,
+        { fontSize:9, lblH:15, maxLabels:6, minGap:36 });
+    }
+  };
+
   STATE.charts[ind.code] = new Chart(ctx, {
     type:'line',
     data:{
@@ -15999,13 +16201,13 @@ function buildMiniChart(ind) {
       datasets:[
         {label:'Resultado',data,borderColor:color,
          backgroundColor:(ctx2)=>{const g=ctx2.chart.ctx.createLinearGradient(0,0,0,ctx2.chart.height);g.addColorStop(0,hexA(color,0.22));g.addColorStop(1,hexA(color,0.00));return g;},
-         tension:0.4,fill:true,pointRadius:0,pointHoverRadius:4,spanGaps:false,borderWidth:2.2},
+         tension:0.4,fill:true,pointRadius:3,pointHoverRadius:5,spanGaps:false,borderWidth:2.2},
         {label:'Meta',data:metaLine,borderColor:'#94A3B8',borderDash:[4,3],borderWidth:1.3,pointRadius:0,fill:false,spanGaps:true}
       ]},
-    plugins:[miniYearSep],
+    plugins:[miniYearSep, miniSmartLabels],
     options:{
       responsive:true,maintainAspectRatio:false,
-      layout:{ padding:{ top: STATE.yearFilter==='all'?12:0 } },
+      layout:{ padding:{ top: 18, bottom: 4, left: 2, right: 2 } },
       plugins:{legend:{display:false},tooltip:{
         backgroundColor:'rgba(15,23,42,0.90)',titleColor:'#94A3B8',bodyColor:'white',padding:10,cornerRadius:8,
         callbacks:{label:(c)=>c.raw===null?null:' '+c.dataset.label+': '+fmt(c.raw,ind.tipo_meta,ind.unidad)}}},
@@ -16247,42 +16449,11 @@ function buildDetailChart(ind, color) {
     }
   };
 
-  // Plugin: etiquetas inteligentes solo en puntos con datos reales
   const dataLabelsPlugin = {
     id: 'smartLabels',
     afterDatasetsDraw(chart) {
-      const ds = chart.data.datasets[0];
-      const meta0 = chart.getDatasetMeta(0);
-      const {ctx: c} = chart;
-      const data = ds.data;
-      // Marcar solo primero, último, max, min de datos reales
-      const realIdxs = data.map((v,i)=>v!==null?i:-1).filter(i=>i>=0);
-      if(!realIdxs.length) return;
-      const maxI = realIdxs.reduce((a,b)=>data[a]>=data[b]?a:b);
-      const minI = realIdxs.reduce((a,b)=>data[a]<=data[b]?a:b);
-      const keyIdxs = new Set([realIdxs[0], realIdxs[realIdxs.length-1], maxI, minI]);
-      keyIdxs.forEach(i => {
-        const pt = meta0.data[i];
-        if(!pt) return;
-        const v = data[i];
-        if(v===null) return;
-        const lbl = fmt(v, ind.tipo_meta, ind.unidad);
-        c.save();
-        c.font='700 10px sans-serif';
-        c.fillStyle=color;
-        c.textAlign='center';
-        const tw = c.measureText(lbl).width + 8;
-        c.fillStyle='white';
-        c.beginPath();
-        c.roundRect(pt.x-tw/2, pt.y-22, tw, 16, 4);
-        c.fill();
-        c.strokeStyle=hexA(color,0.3);
-        c.lineWidth=1;
-        c.stroke();
-        c.fillStyle=color;
-        c.fillText(lbl, pt.x, pt.y-11);
-        c.restore();
-      });
+      drawSmartLabels(chart, chart.data.datasets[0].data, color, fmt, ind.tipo_meta, ind.unidad,
+        { fontSize:10, lblH:17, maxLabels:8, minGap:44 });
     }
   };
 
@@ -17356,12 +17527,20 @@ function exportConsolidado() {
 }
 
 
+function updateStickyTop() {
+  const hdr = document.querySelector('.header');
+  const st  = document.querySelector('.sticky-top');
+  if (hdr && st) st.style.top = hdr.offsetHeight + 'px';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderHeaderKPIs();
   renderGauges();
   renderFilters();
   renderMatriz();
   renderPerspectives();
+  updateStickyTop();
+  window.addEventListener('resize', updateStickyTop);
   document.addEventListener('keydown', e => {
     if(e.key==='Escape'){ if(STATE.activeKpi) closePopover(); else closeModal(); }
   });
