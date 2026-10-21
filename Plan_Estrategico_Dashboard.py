@@ -2937,6 +2937,7 @@ function renderPerspectives() {
   const root = document.getElementById('perspectives');
   Object.entries(STATE.charts).forEach(([k,ch]) => { if(k!=='detail'){try{ch.destroy();}catch(e){}} });
   STATE.charts = STATE.charts.detail ? {detail: STATE.charts.detail} : {};
+  if (!root) return;  // sección de tarjetas retirada del tablero
 
   const visiblePersps = DATA.perspectives.filter(p =>
     STATE.perspFilter === 'all' || STATE.perspFilter === p.key
@@ -5198,9 +5199,6 @@ __CSS__
 
     <div style="padding: 16px 24px 0; max-width:1400px; margin: 0 auto;" id="main-content">
     <div id="matriz-panel"></div>
-
-    <div class="section-title">Perspectivas e indicadores</div>
-    <div id="perspectives"></div>
     </div><!-- /main-content -->
 
     <div class="footer" style="max-width:1400px;margin:0 auto;padding:22px 32px;">
