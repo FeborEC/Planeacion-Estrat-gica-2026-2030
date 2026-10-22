@@ -44,6 +44,7 @@ Estructura interna del script
 import sys
 import json
 import math
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -2054,6 +2055,55 @@ body { background: var(--nm-bg); }
 .mtz-light.pendiente .nm-tick { display: none; }
 .mtz-light.pendiente .mtz-val { color: #A3AEC2; }
 
+/* Botón y ventana de escalas */
+.btn-escalas .xl-icon { background: var(--v-amber) !important; }
+.header-titles { min-width: 360px; }
+.header-titles h1 { white-space: nowrap; }
+.header-btns { flex-wrap: wrap; justify-content: flex-end; }
+.header-btns > * { padding: 8px 14px; font-size: 0.82rem; }
+.header-btns .xl-icon { width: 26px; height: 26px; }
+.header-btns .xl-icon svg { width: 15px; height: 15px; }
+@media (max-width: 768px) { .header-titles { min-width: 0; } .header-titles h1 { white-space: normal; } }
+.esc-link {
+  border: none; background: var(--nm-bg); box-shadow: var(--nm-raised-sm); border-radius: 999px;
+  padding: 4px 12px; font-size: 0.74rem; font-weight: 700; color: var(--v-blue); cursor: pointer;
+}
+.esc-link:hover { box-shadow: var(--nm-inset); }
+#modal-content:has(.esc-groups) { max-width: 760px; background: var(--nm-bg); }
+.esc-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.esc-card {
+  display: flex; gap: 12px; align-items: flex-start; padding: 14px;
+  background: var(--nm-bg); border-radius: 14px; box-shadow: var(--nm-raised);
+}
+.esc-card .nm-tick svg { width: 18px; height: 18px; }
+.esc-title { font-size: 0.72rem; font-weight: 800; color: var(--text-med); text-transform: uppercase; letter-spacing: 0.06em; }
+.esc-big { font-size: 1.35rem; font-weight: 900; line-height: 1.2; }
+.esc-big.cumple { color: #0B9A5C; } .esc-big.riesgo { color: #D98500; }
+.esc-big.critico { color: #E8324F; } .esc-big.pendiente { color: #94A3B8; }
+.esc-desc { font-size: 0.78rem; color: var(--text-med); }
+.esc-formulas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+.esc-f {
+  display: flex; flex-direction: column; gap: 4px; padding: 12px;
+  border-radius: 12px; box-shadow: var(--nm-inset); font-size: 0.82rem;
+}
+.esc-f span { font-family: Consolas, monospace; font-size: 0.78rem; color: var(--v-violet); font-weight: 700; }
+.esc-f small { color: var(--text-med); font-size: 0.72rem; }
+.esc-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.84rem; }
+.esc-table th { text-align: left; font-size: 0.68rem; color: var(--text-med); text-transform: uppercase; letter-spacing: 0.06em; padding: 6px 8px; }
+.esc-table td { padding: 6px 8px; border-top: 1px solid var(--nm-line); }
+.esc-level { display: inline-block; padding: 3px 10px; border-radius: 8px; font-weight: 700; white-space: nowrap; }
+.esc-ldesc { color: var(--text-med); font-size: 0.78rem; }
+.esc-range { font-variant-numeric: tabular-nums; color: var(--text-med); }
+.esc-pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 2px;
+  border-radius: 999px; background: var(--nm-bg); box-shadow: var(--nm-raised-sm); font-weight: 700; font-size: 0.76rem;
+}
+.esc-pill .nm-tick { width: 20px; height: 20px; }
+.esc-pill.cumple { color: #0B9A5C; } .esc-pill.riesgo { color: #D98500; }
+.esc-pill.critico { color: #E8324F; }
+.esc-note { margin-top: 16px; font-size: 0.76rem; color: var(--text-med); }
+@media (max-width: 640px) { .esc-groups, .esc-formulas { grid-template-columns: 1fr; } }
+
 /* Barra compacta en el mismo estilo */
 .cbar { background: var(--nm-bg); color: var(--text-dark); box-shadow: 0 6px 14px var(--nm-lo); }
 .cbar-kpi { background: var(--nm-bg); border: none; box-shadow: var(--nm-raised-sm); color: var(--text-dark); }
@@ -2101,7 +2151,10 @@ function getSemaforoColors() {
 }
 
 function getSemaforoEntry(pct) {
-  if (pct === null || pct === undefined) return { bg:'#F1F5F9', fg:'#64748B', name:'Pendiente' };
+  if (pct === null || pct === undefined) {
+    return (typeof DATA !== 'undefined' && DATA.thresholds && DATA.thresholds.pendiente)
+      || { bg:'#F1F5F9', fg:'#64748B', name:'Pendiente' };
+  }
   const colors = getSemaforoColors();
   if (pct < 0) return colors[colors.length - 1]; // negativo → Muy crítico
   for (const e of colors) { if (pct >= e.lim) return e; }
@@ -2852,9 +2905,10 @@ function renderMatriz() {
         </div>
         <div class="matriz-footer-bar">
           <div class="mleg">
-            <span class="mleg-item"><span class="mleg-dot2 cumple"></span> Cumple (≥95%)</span>
-            <span class="mleg-item"><span class="mleg-dot2 riesgo"></span> En riesgo (80–95%)</span>
-            <span class="mleg-item"><span class="mleg-dot2 critico"></span> Crítico (&lt;80%)</span>
+            <span class="mleg-item"><span class="mleg-dot2 cumple"></span> En meta (≥${Math.round(DATA.thresholds.cumple*100)}%)</span>
+            <span class="mleg-item"><span class="mleg-dot2 riesgo"></span> En riesgo (${Math.round(DATA.thresholds.riesgo*100)}–${Math.round(DATA.thresholds.cumple*100)-1}%)</span>
+            <span class="mleg-item"><span class="mleg-dot2 critico"></span> Crítico (&lt;${Math.round(DATA.thresholds.riesgo*100)}%)</span>
+            <button class="esc-link" onclick="openEscalas()">Ver escalas</button>
             <span class="mleg-item"><span class="mleg-dot2 pendiente"></span> Sin datos</span>
           </div>
           <div class="mtz-last-update">
@@ -3938,6 +3992,72 @@ function highlightChartPoint(code, flatIdx) {
 function closeModal() {
   document.getElementById('modal-overlay').classList.remove('active');
   if(STATE.charts.detail){try{STATE.charts.detail.destroy();}catch(e){}delete STATE.charts.detail;}
+}
+
+// ── Ventana de escalas de cumplimiento ────────────────────
+function openEscalas() {
+  const tCumple = DATA.thresholds.cumple, tRiesgo = DATA.thresholds.riesgo;
+  const pct = v => Math.round(v * 100) + '%';
+  const groups = [
+    { st:'cumple',    title:'En meta',   range:`≥ ${pct(tCumple)}`, desc:'Se alcanzó o superó la meta.' },
+    { st:'riesgo',    title:'En riesgo', range:`${pct(tRiesgo)} – ${Math.round(tCumple*100)-1}%`, desc:'Por debajo de la meta; requiere seguimiento.' },
+    { st:'critico',   title:'Crítico',   range:`< ${pct(tRiesgo)}`, desc:'Muy lejos de la meta; requiere acción.' },
+    { st:'pendiente', title:'Sin datos', range:'—', desc:'Aún no hay resultado registrado.' },
+  ];
+
+  // Niveles del semáforo leídos de la hoja Parámetros (mayor → menor límite)
+  const levels = getSemaforoColors();
+  const pend = DATA.thresholds.pendiente;
+  const levelRow = (lv, range, st) => `<tr>
+      <td><span class="esc-level" style="background:${lv.bg};color:${lv.fg}">${lv.emoji ? lv.emoji + ' ' : ''}${escapeHTML(lv.name)}</span></td>
+      <td class="esc-range">${range}</td>
+      <td class="esc-ldesc">${escapeHTML(lv.desc || '')}</td>
+      <td><span class="esc-pill ${st}"><span class="nm-tick ${st}">${NM_TICK[st]}</span>${groups.find(g=>g.st===st).title}</span></td>
+    </tr>`;
+  const levelRows = levels.map((lv, i) => {
+    const upper = i === 0 ? null : levels[i - 1].lim;
+    const range = upper === null ? `≥ ${pct(lv.lim)}`
+      : lv.lim < 0 ? `< ${pct(upper)}` : `${pct(lv.lim)} – ${Math.round(upper*100)-1}%`;
+    return levelRow(lv, range, nmStatus(lv.lim < 0 ? 0 : lv.lim));
+  }).join('') + (pend ? levelRow(pend, '—', 'pendiente') : '');
+
+  const content = document.getElementById('modal-content');
+  content.innerHTML = `
+    <div class="modal-head">
+      <div style="flex:1;min-width:0">
+        <div class="m-code">Guía del tablero</div>
+        <div class="m-name">Escalas de cumplimiento de la meta</div>
+        <div style="font-size:0.84rem;color:var(--text-med)">El color de cada mes y de cada indicador depende del % de cumplimiento frente a su meta.</div>
+      </div>
+      <button class="modal-close" id="escalas-close" aria-label="Cerrar">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="esc-groups">
+        ${groups.map(g => `<div class="esc-card">
+          <span class="nm-tick ${g.st}" style="width:34px;height:34px">${NM_TICK[g.st]}</span>
+          <div><div class="esc-title">${g.title}</div><div class="esc-big ${g.st}">${g.range}</div><div class="esc-desc">${g.desc}</div></div>
+        </div>`).join('')}
+      </div>
+
+      <div class="m-section-label" style="margin-top:22px">Cómo se calcula el cumplimiento</div>
+      <div class="esc-formulas">
+        <div class="esc-f"><b>↑ Crecer</b><span>Resultado ÷ Meta</span><small>Meta 15%, resultado 12% → 80% · En riesgo</small></div>
+        <div class="esc-f"><b>↓ Reducir</b><span>1 − (Resultado − Meta) ÷ Meta</span><small>Meta 5%, resultado 6% → 80% · En riesgo</small></div>
+        <div class="esc-f"><b>↔ Mantener</b><span>1 − |Resultado − Meta|</span><small>Se penaliza alejarse de la meta hacia arriba o hacia abajo</small></div>
+      </div>
+
+      ${levelRows ? `<div class="m-section-label" style="margin-top:22px">Niveles del semáforo</div>
+      <table class="esc-table">
+        <thead><tr><th>Nivel</th><th>Cumplimiento</th><th>Descripción</th><th>Estado en el tablero</th></tr></thead>
+        <tbody>${levelRows}</tbody>
+      </table>` : ''}
+      <div class="esc-note">Los cortes se leen de la hoja <b>Parámetros</b> del Excel. El % anual es el promedio de los meses del año (tope 150%).</div>
+    </div>`;
+
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.add('active');
+  overlay.onclick = e => { if (e.target === overlay) closeModal(); };
+  document.getElementById('escalas-close').addEventListener('click', closeModal);
 }
 
 // ── Helpers ───────────────────────────────────────────────
@@ -5155,6 +5275,12 @@ __CSS__
 
       <!-- Botones header -->
       <div class="header-btns">
+        <button class="btn-datos-origen btn-escalas" onclick="openEscalas()">
+          <div class="xl-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 1 8-8"/><path d="M12 12l4-4"/><path d="M4 12h1"/><path d="M12 4v1"/><path d="M19 12h1"/></svg>
+          </div>
+          <span class="xl-label">Escalas de la meta</span>
+        </button>
         <a href="https://feborec.github.io/Ruta-Plan-Estrat-gico-2026-2030/" target="_blank" class="btn-ruta-estrategica">
           <div class="xl-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M13 5l7 7-7 7"/></svg>
@@ -6004,35 +6130,109 @@ def validate_indicator(ind):
 # PROCESAMIENTO COMPLETO
 # ============================================================
 
-def load_semaforo_thresholds(wb):
-    """Lee 10 deciles desde col B (límites) y col C (nombres) en Parámetros.
-    La tabla está en orden ASC (0%→100%) para BUSCARV con coincidencia aproximada.
-    Retorna (dict_deciles, threshold_satisfactorio, threshold_en_riesgo).
-    """
-    DECIL_NAMES = ['Muy crítico','Crítico','En alerta','En riesgo',
-                   'En seguimiento','Aceptable','Satisfactorio','Sobresaliente','Excelente']
-    defaults = dict(zip(DECIL_NAMES, [0.0,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]))
+# Valores de respaldo si la tabla del semáforo no se puede leer del Excel
+SEMAFORO_LEVELS_DEFAULT = [
+    {'lim':1.00,'bg':'#83F1B7','fg':'#006666','name':'Excelente','emoji':'🏆','desc':'Supera ampliamente el objetivo'},
+    {'lim':0.90,'bg':'#BBF9D0','fg':'#15803D','name':'Sobresaliente','emoji':'🟢','desc':'Muy por encima del objetivo'},
+    {'lim':0.80,'bg':'#BBF9D0','fg':'#15803D','name':'Satisfactorio','emoji':'🔵','desc':'Dentro del objetivo'},
+    {'lim':0.70,'bg':'#FEF9C3','fg':'#A16207','name':'Aceptable','emoji':'🟦','desc':'Cerca del objetivo'},
+    {'lim':0.60,'bg':'#FEF9C3','fg':'#A16207','name':'En seguimiento','emoji':'🟡','desc':'Por debajo — requiere acción'},
+    {'lim':0.50,'bg':'#FFD3A7','fg':'#EA580C','name':'En riesgo','emoji':'🟠','desc':'Brecha significativa'},
+    {'lim':0.40,'bg':'#FFD3A7','fg':'#EA580C','name':'En alerta','emoji':'🔶','desc':'Plan de mejora inmediato'},
+    {'lim':0.30,'bg':'#FEE2E2','fg':'#DC2626','name':'Crítico','emoji':'🔴','desc':'Incumplimiento grave'},
+    {'lim':-100000,'bg':'#FEC9C9','fg':'#B91C1C','name':'Muy crítico','emoji':'⛔','desc':'Incumplimiento severo'},
+]
+SEMAFORO_PENDIENTE_DEFAULT = {'bg':'#F1F5F9','fg':'#64748B','name':'Pendiente','emoji':'⚪','desc':'Sin datos registrados'}
+SEMAFORO_LEVELS = list(SEMAFORO_LEVELS_DEFAULT)
+SEMAFORO_PENDIENTE = dict(SEMAFORO_PENDIENTE_DEFAULT)
+
+
+def _cell_rgb(color):
+    """Color ARGB de openpyxl → '#RRGGBB' (None si es de tema o no está definido)."""
     try:
-        wp = wb['Parámetros']
-        thresholds = {}
-        for r in range(1, wp.max_row + 1):
-            # Tabla ASC: col B = límite numérico, col C = nombre del nivel
-            lim = wp.cell(r, 2).value
-            nombre = wp.cell(r, 3).value
-            if nombre in DECIL_NAMES and isinstance(lim, (int, float)):
-                thresholds[nombre] = float(lim)
-        if len(thresholds) >= 5:
-            t_s = thresholds.get('Satisfactorio', 0.80)
-            t_r = thresholds.get('En riesgo', 0.50)
-            print(f"   ✓ Semáforo: {len(thresholds)} deciles · Satisfactorio ≥ {t_s*100:.0f}%  ·  En riesgo ≥ {t_r*100:.0f}%")
-            return thresholds, t_s, t_r
+        rgb = color.rgb if color is not None else None
     except Exception:
-        pass
-    print("   ✓ Semáforo: 10 deciles (valores por defecto)")
-    return defaults, 0.80, 0.50
+        return None
+    if isinstance(rgb, str) and len(rgb) in (6, 8):
+        return '#' + rgb[-6:].upper()
+    return None
 
 
-THRESHOLD_CUMPLE = 0.80
+def _clean_level_desc(text):
+    """Quita el rango entre paréntesis del final, p. ej. '(30–39%)': el tablero lo calcula."""
+    if not isinstance(text, str):
+        return ''
+    return re.sub(r'\s*\([^)]*%\)\s*$', '', text).strip()
+
+
+def load_semaforo_levels(wb):
+    """Lee la tabla del semáforo de Parámetros (debajo del título 'SEMÁFORO'):
+    col B = límite inferior, C = nivel (su relleno y color de letra = colores
+    del nivel), D = emoji, E = descripción. La fila 'Pendiente' define el estado
+    sin datos. Retorna (niveles de mayor a menor límite, nivel pendiente)."""
+    wp = wb['Parámetros']
+    start = None
+    for r in range(1, wp.max_row + 1):
+        v = wp.cell(r, 2).value
+        if isinstance(v, str) and 'SEMÁFORO' in v.upper():
+            start = r
+            break
+    if start is None:
+        return None, None
+    defaults = {lv['name']: lv for lv in SEMAFORO_LEVELS_DEFAULT}
+    levels, pendiente = [], None
+    for r in range(start + 1, min(start + 30, wp.max_row + 1)):
+        name = wp.cell(r, 3).value
+        if not isinstance(name, str) or not name.strip():
+            continue
+        name = name.strip()
+        c = wp.cell(r, 3)
+        fill = _cell_rgb(c.fill.fgColor) if c.fill is not None and c.fill.fill_type else None
+        font = _cell_rgb(c.font.color) if c.font is not None else None
+        dflt = defaults.get(name, SEMAFORO_PENDIENTE_DEFAULT if name == 'Pendiente' else {})
+        entry = {
+            'name':  name,
+            'emoji': wp.cell(r, 4).value or dflt.get('emoji', ''),
+            'desc':  _clean_level_desc(wp.cell(r, 5).value) or dflt.get('desc', ''),
+            'bg':    fill or dflt.get('bg', '#F1F5F9'),
+            'fg':    font or dflt.get('fg', '#475569'),
+        }
+        lim = wp.cell(r, 2).value
+        if isinstance(lim, (int, float)) and not isinstance(lim, bool):
+            entry['lim'] = float(lim)
+            levels.append(entry)
+        elif name == 'Pendiente':
+            pendiente = entry
+            break
+    if len(levels) < 3:
+        return None, None
+    levels.sort(key=lambda lv: lv['lim'], reverse=True)
+    return levels, pendiente or dict(SEMAFORO_PENDIENTE_DEFAULT)
+
+
+def load_semaforo_thresholds(wb):
+    """Carga los niveles del semáforo desde Parámetros y deriva los cortes:
+    verde (en meta) desde el nivel 'Excelente' y ámbar desde 'En riesgo'.
+    Retorna (dict_deciles, threshold_en_meta, threshold_en_riesgo)."""
+    global SEMAFORO_LEVELS, SEMAFORO_PENDIENTE
+    try:
+        levels, pendiente = load_semaforo_levels(wb)
+    except Exception:
+        levels, pendiente = None, None
+    if levels:
+        SEMAFORO_LEVELS, SEMAFORO_PENDIENTE = levels, pendiente
+    else:
+        print("   ⚠️  Semáforo: no se pudo leer la tabla de Parámetros (valores por defecto)")
+        SEMAFORO_LEVELS = list(SEMAFORO_LEVELS_DEFAULT)
+        SEMAFORO_PENDIENTE = dict(SEMAFORO_PENDIENTE_DEFAULT)
+    deciles = {lv['name']: lv['lim'] for lv in SEMAFORO_LEVELS}
+    # Verde solo cuando se alcanza o supera la meta (nivel 'Excelente')
+    t_s = deciles.get('Excelente', SEMAFORO_LEVELS[0]['lim'])
+    t_r = deciles.get('En riesgo', 0.50)
+    return deciles, t_s, t_r
+
+
+THRESHOLD_CUMPLE = 1.00
 THRESHOLD_RIESGO = 0.50
 THRESHOLD_DECILES = {
     'Excelente':1.0,'Sobresaliente':0.9,'Satisfactorio':0.8,
@@ -6047,7 +6247,7 @@ def process_workbook(xlsx_path):
     wb_dt = load_workbook(xlsx_path, data_only=True)    # valores calculados
     global THRESHOLD_CUMPLE, THRESHOLD_RIESGO, THRESHOLD_DECILES
     THRESHOLD_DECILES, THRESHOLD_CUMPLE, THRESHOLD_RIESGO = load_semaforo_thresholds(wb)
-    print(f"   ✓ Semáforo: {len(THRESHOLD_DECILES)} deciles · Satisfactorio ≥ {THRESHOLD_CUMPLE*100:.0f}%  ·  En riesgo ≥ {THRESHOLD_RIESGO*100:.0f}%")
+    print(f"   ✓ Semáforo: {len(THRESHOLD_DECILES)} deciles · En meta ≥ {THRESHOLD_CUMPLE*100:.0f}%  ·  En riesgo ≥ {THRESHOLD_RIESGO*100:.0f}%")
     responsables = _read_responsables(wb)
 
     indicators = []
@@ -6169,17 +6369,9 @@ def build_payload(indicators, wb_src=None):
             'cumple': THRESHOLD_CUMPLE,
             'riesgo': THRESHOLD_RIESGO,
             'deciles': THRESHOLD_DECILES,
-            'colors': [
-                {'lim':1.00,'bg':'#83F1B7','fg':'#006666','name':'Excelente'},
-                {'lim':0.90,'bg':'#B9F9CE','fg':'#15803D','name':'Sobresaliente'},
-                {'lim':0.80,'bg':'#B9F9CE','fg':'#15803D','name':'Satisfactorio'},
-                {'lim':0.70,'bg':'#FEF9C3','fg':'#A16207','name':'Aceptable'},
-                {'lim':0.60,'bg':'#FEF9C3','fg':'#A16207','name':'En seguimiento'},
-                {'lim':0.50,'bg':'#FFD3A7','fg':'#D97706','name':'En riesgo'},
-                {'lim':0.40,'bg':'#FFD3A7','fg':'#EA580C','name':'En alerta'},
-                {'lim':0.30,'bg':'#FEE2E2','fg':'#DC2626','name':'Crítico'},
-                {'lim':0.00,'bg':'#FEC9C9','fg':'#B91C1C','name':'Muy crítico'},
-            ],
+            # Niveles leídos de Parámetros (mayor → menor límite) y estado sin datos
+            'colors': SEMAFORO_LEVELS,
+            'pendiente': SEMAFORO_PENDIENTE,
         },
     }
 
