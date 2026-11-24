@@ -843,7 +843,10 @@ body {
 .matriz-scroll {
   overflow-x: auto; -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
+  /* el desplazamiento encaja por columnas: ningún mes queda medio tapado por la columna fija del indicador (300 px) */
+  scroll-snap-type: x mandatory; scroll-padding-left: 300px;
 }
+.mtz-month-cell, .mtz-tend-cell, .mtz-meta-cell { scroll-snap-align: start; }
 .matriz-scroll::-webkit-scrollbar { height: 5px; }
 .matriz-scroll::-webkit-scrollbar-track { background: var(--surface-2); }
 .matriz-scroll::-webkit-scrollbar-thumb { background: #94A3B8; border-radius: 999px; }
