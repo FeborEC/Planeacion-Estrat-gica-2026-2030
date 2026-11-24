@@ -23,11 +23,11 @@ Uso
     python3 "Plan Estrategico Dashboard.py" <ruta_excel> <ruta_salida_html>
 
 Por defecto:
-    Input:  Tablero_Indicadores_PE.xlsx
+    Input:  2_Tablero_Indicadores_PE.xlsx   (paso 3 del proceso mensual: 3_Generar_dashboard.py)
     Output: docs/index.html
 
 Archivo auxiliar opcional en la misma carpeta:
-    chart_umd.js   ← Chart.js (si existe se embebe; si no, se carga desde CDN)
+    Soporte/chart_umd.js   ← Chart.js (si existe se embebe; si no, se carga desde CDN)
 
 Estructura interna del script
 -----------------------------
@@ -5446,7 +5446,7 @@ def _load_chartjs():
     que carga desde CDN (útil cuando el dashboard se publica en GitHub Pages)."""
     import os
     here = os.path.dirname(os.path.abspath(__file__))
-    chart_path = os.path.join(here, 'chart_umd.js')
+    chart_path = next((p for p in (os.path.join(here, 'Soporte', 'chart_umd.js'), os.path.join(here, 'chart_umd.js')) if os.path.exists(p)), os.path.join(here, 'chart_umd.js'))
     if os.path.exists(chart_path):
         with open(chart_path, 'r', encoding='utf-8') as f:
             return f.read()
@@ -6908,8 +6908,8 @@ def main():
     no_publish = '--no-publish' in flags
     do_setup = '--setup-github' in flags
 
-    xlsx_path = Path(args[0]) if args else Path('Tablero_Indicadores_PE.xlsx')
-    out_path = Path(args[1]) if len(args) > 1 else Path('docs/index.html')
+    xlsx_path = Path(args[0]) if args else Path(__file__).resolve().parent / '2_Tablero_Indicadores_PE.xlsx'
+    out_path = Path(args[1]) if len(args) > 1 else Path(__file__).resolve().parent / 'docs' / 'index.html'
 
     if not xlsx_path.exists():
         print(f"❌ ERROR: archivo no encontrado: {xlsx_path}")

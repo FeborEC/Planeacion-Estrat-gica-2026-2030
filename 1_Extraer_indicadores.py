@@ -6,8 +6,9 @@ Lee las fuentes mensuales que ya usa el Modelo de Riesgos Financieros (balance d
 Solvencia_PT_Mes, repositorios de cartera e individual de aportes), calcula las variables de captura de
 las hojas IND-XX de Tablero_Indicadores_PE.xlsx y:
 
-  1. Siempre genera Comparacion_Extraccion_PE.xlsx: por hoja, variable y mes, lo digitado frente a lo
-     calculado, la diferencia y qué se hizo con la celda.
+  1. Siempre genera Auditoria_Extraccion_PE.xlsx: abre en la hoja Comparacion (por hoja, variable y mes, lo digitado
+     frente a lo calculado, la diferencia y qué se hizo con la celda) y trae los datos de origen y todas las
+     variables con fórmulas de Excel.
   2. Según el MODO, escribe en las celdas azules (de captura) del tablero:
        COMPARAR   no escribe nada (solo el informe)
        VACIOS     llena solo las celdas vacías (no toca lo ya digitado)
@@ -15,18 +16,20 @@ las hojas IND-XX de Tablero_Indicadores_PE.xlsx y:
      Las celdas con fórmula nunca se tocan.
 
 La escritura se hace con el propio Excel (una instancia aparte, invisible): así se conservan comentarios,
-formatos y fórmulas, y Excel recalcula y guarda los resultados que lee Plan_Estrategico_Dashboard.py.
+formatos y fórmulas, y Excel recalcula y guarda los resultados que lee 3_Generar_dashboard.py.
 Antes de escribir se saca un respaldo del tablero en la carpeta _respaldos.
 
 Todo lo configurable (rutas, mes inicial, modo, cuentas contables y reglas de cada variable) está en
 Parametros_Extraccion_PE.xlsx; si no existe, el script lo crea con los valores iniciales.
 
+Paso 1 del proceso mensual (0_Actualizar_mes.bat lo corre solo).
+
 Uso:
-    python extraer_indicadores_pe.py                 usa el MODO del libro de parámetros
-    python extraer_indicadores_pe.py --comparar      solo el informe de comparación
-    python extraer_indicadores_pe.py --vacios        llena las celdas vacías
-    python extraer_indicadores_pe.py --reemplazar    sobrescribe las celdas calculables
-    python extraer_indicadores_pe.py --reemplazar --hojas IND-13    solo escribe en las hojas indicadas
+    python 1_Extraer_indicadores.py                 usa el MODO del libro de parámetros
+    python 1_Extraer_indicadores.py --comparar      solo el informe de comparación
+    python 1_Extraer_indicadores.py --vacios        llena las celdas vacías
+    python 1_Extraer_indicadores.py --reemplazar    sobrescribe las celdas calculables
+    python 1_Extraer_indicadores.py --reemplazar --hojas IND-13    solo escribe en las hojas indicadas
 """
 import datetime
 import glob
@@ -40,11 +43,11 @@ import openpyxl
 import pandas as pd
 from openpyxl.styles import Alignment, Font, PatternFill
 
-VERSION = '1.1.1'
+VERSION = '1.3.0'
 BASE = os.path.dirname(os.path.abspath(__file__))
-TABLERO = os.path.join(BASE, 'Tablero_Indicadores_PE.xlsx')
-PARAMS = os.path.join(BASE, 'Parametros_Extraccion_PE.xlsx')
-INFORME = os.path.join(BASE, 'Comparacion_Extraccion_PE.xlsx')
+TABLERO = os.path.join(BASE, '2_Tablero_Indicadores_PE.xlsx')
+PARAMS = os.path.join(BASE, 'Configuracion', 'Parametros_Extraccion_PE.xlsx')
+INFORME = os.path.join(BASE, 'Revision', 'Comparacion_Extraccion_PE.xlsx')   # ya no se genera (la comparación va en la auditoría)
 RESPALDOS = os.path.join(BASE, '_respaldos')
 
 MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre',
@@ -63,8 +66,6 @@ class ErrorExtraccion(Exception):
 GENERAL = [
     ['RUTA_FUENTES', r'D:\Diana Fonseca\Asistente Claude\Modelo de Riesgos Global\Fuentes de información',
      'Carpeta «Fuentes de información» del Modelo de Riesgos (Solvencia_PT_Mes, Repositorios_Cartera_Mes, Individual_Aportes_Mes)'],
-    ['RUTA_PARAMETROS_RIESGOS', r'D:\Diana Fonseca\Asistente Claude\Modelo de Riesgos Global\Fuentes de información\Parametros\Parametros_Riesgos_Financieros.xlsx',
-     'Libro de parámetros del Modelo de Riesgos: de su hoja PRODUCTOS sale la categoría de cada línea de crédito (Rotativo, Tarjeta, Consumo…)'],
     ['MES_INICIAL', '2026-01', 'Primer mes (AAAA-MM) que se calcula; también se lee diciembre del año anterior como base'],
     ['MODO', 'VACIOS', 'COMPARAR = solo informe · VACIOS = llena solo celdas vacías · REEMPLAZAR = sobrescribe las celdas calculables (las fórmulas nunca se tocan)'],
     ['MESES_PROMEDIO', 12, 'FUENTE BALANCE_PROMEDIO: número de cierres mensuales que se promedian (el mes y los anteriores; 12 = el mes y los 11 anteriores)'],
@@ -76,7 +77,7 @@ GENERAL = [
 #   BALANCE_MES    movimiento del mes de las cuentas (estado de resultados: saldo acumulado del mes menos el del mes anterior; en enero, el acumulado)
 #   BALANCE_SALDO  saldo de las cuentas al cierre del mes (en resultados = acumulado del año)
 #   BALANCE_PROMEDIO promedio del saldo de las cuentas en los últimos MESES_PROMEDIO cierres (el mes y los anteriores)
-#   CARTERA        TOTAL · CATEGORIAS:cat1;cat2 · MORA_OBJETIVA (calificación objetiva B a E) · LINEA:nombre · LINEA_A:nombre (calificación objetiva A)
+#   CARTERA        TOTAL · GRUPO:grupo1;grupo2 (hoja LINEAS) · MORA_OBJETIVA (calificación objetiva B a E) · LINEA:nombre · LINEA_A:nombre (calificación objetiva A)
 #                  · TRANSICION_RECUPERACION · TRANSICION_DETERIORO (matriz de transición objetiva mes anterior → mes, como el Modelo de Riesgos)
 #   ASOCIADOS      TOTAL · BASE_DIC · SE_MANTIENEN · NUEVOS · RETIROS (cédulas del individual de aportes frente a diciembre del año anterior)
 # DEFINICION de balance: cuentas con signo y factor opcional, p. ej. «51+52», «21-210595-211095», «0.2*3505»
@@ -87,7 +88,7 @@ VARIABLES = [
     ['IND-F2', 'Ingresos totales ($)', 'BALANCE_MES', '4', 'SI', 'Ingresos (4) del mes'],
     ['IND-F3', 'Excedente del período ($)', 'BALANCE_MES', '53', 'SI', 'Excedentes y pérdidas del ejercicio (53) del mes'],
     ['IND-F3', 'Ingresos totales ($)', 'BALANCE_MES', '4', 'SI', 'Ingresos (4) del mes'],
-    ['IND-01', 'Saldo cartera líneas mayor rendimiento ($)', 'CARTERA', 'CATEGORIAS:Rotativo;Tarjeta', 'SI', 'Saldo de capital de las líneas de categoría Rotativo y Tarjeta (hoja PRODUCTOS del Modelo de Riesgos)'],
+    ['IND-01', 'Saldo cartera líneas mayor rendimiento ($)', 'CARTERA', 'GRUPO:Mayor rendimiento', 'SI', 'Saldo de capital de las líneas del grupo «Mayor rendimiento» de la hoja LINEAS (rotativos y tarjetas)'],
     ['IND-01', 'Saldo total de cartera ($)', 'CARTERA', 'TOTAL', 'SI', 'Saldo de capital de todo el repositorio de cartera'],
     ['IND-02', 'Ingresos de cartera del mes ($)', 'BALANCE_MES', '4150', 'SI', 'Ingresos cartera de créditos (4150) del mes'],
     ['IND-02', 'Ingresos Acumulados', 'BALANCE_SALDO', '4150', 'SI', 'Ingresos cartera de créditos (4150) acumulados del año'],
@@ -119,6 +120,7 @@ VARIABLES = [
 
 
 def crear_parametros():
+    os.makedirs(os.path.dirname(PARAMS), exist_ok=True)
     wb = openpyxl.Workbook()
     cab = Font(bold=True, color='FFFFFF')
     fondo = PatternFill('solid', fgColor='0B5D3B')
@@ -141,10 +143,11 @@ def crear_parametros():
         'FUENTE = BALANCE_SALDO: saldo al cierre del mes (en cuentas de resultados es el acumulado del año).',
         'FUENTE = BALANCE_PROMEDIO: promedio del saldo de las cuentas en los últimos MESES_PROMEDIO cierres mensuales (hoja GENERAL; 12 = el mes y los 11 anteriores).',
         '   DEFINICION: cuentas con signo y factor opcional, p. ej. 51+52, 21-210595-211095, 0.2*3505. Toma el NUEVO SALDO de la hoja «Balance» de Solvencia_PT_Mes.',
-        'FUENTE = CARTERA (repositorio de cartera, saldo de capital): TOTAL, CATEGORIAS:Rotativo;Tarjeta, MORA_OBJETIVA, LINEA:nombre de la línea, LINEA_A:nombre de la línea (solo calificación objetiva A),',
+        'FUENTE = CARTERA (repositorio de cartera, saldo de capital): TOTAL, GRUPO:Mayor rendimiento (grupos de la hoja LINEAS), MORA_OBJETIVA, LINEA:nombre de la línea, LINEA_A:nombre de la línea (solo calificación objetiva A),',
         '   TRANSICION_RECUPERACION y TRANSICION_DETERIORO (matriz de transición objetiva del mes anterior al mes, igual que el Modelo de Riesgos).',
         'FUENTE = ASOCIADOS (cédulas del individual de aportes): TOTAL, BASE_DIC, SE_MANTIENEN, NUEVOS, RETIROS (frente a diciembre del año anterior).',
         'ACTIVO = SI / NO. Una fila en NO no se calcula ni se escribe.',
+        'LINEAS: cada línea de crédito del repositorio y su GRUPO (p. ej. «Mayor rendimiento»). Las líneas nuevas que aparezcan en el repositorio se avisan al correr el script para que les asigne grupo.',
         'Las celdas con fórmula del tablero nunca se tocan. Antes de escribir se saca un respaldo en la carpeta _respaldos.',
     ]:
         ws3.append([t])
@@ -217,6 +220,19 @@ def leer_balance(raiz, am):
             continue
     wb.close()
     return d
+
+
+def grupos_lineas():
+    """{línea normalizada: grupo} de la hoja LINEAS de Parametros_Extraccion_PE.xlsx y el conjunto de líneas listadas."""
+    try:
+        p = pd.read_excel(PARAMS, sheet_name='LINEAS')
+    except Exception:                                        # noqa: BLE001
+        return {}, set()
+    g = {}
+    for a, b in zip(p['LINEA'], p['GRUPO']):
+        if pd.notna(a):
+            g.setdefault(_n(a), str(b).strip() if pd.notna(b) else '')
+    return g, set(g)
 
 
 def productos_categoria(ruta):
@@ -299,7 +315,7 @@ def calcular(gen, variables):
     fuentes = {str(v['FUENTE']).strip().upper() for v in variables}
     print(f'Meses: {meses[0]} a {meses[-1]}')
     bal, car, aso = {}, {}, {}
-    cat = productos_categoria(str(gen.get('RUTA_PARAMETROS_RIESGOS', ''))) if 'CARTERA' in fuentes else {}
+    cat, listadas = grupos_lineas() if 'CARTERA' in fuentes else ({}, set())
     nprom = int(float(gen.get('MESES_PROMEDIO', 12) or 12))
     if 'BALANCE_PROMEDIO' in fuentes:                     # cierres anteriores al primer mes que pide el promedio
         y, m = divmod(meses[0], 100)
@@ -314,9 +330,9 @@ def calcular(gen, variables):
         if 'ASOCIADOS' in fuentes:
             aso[am] = leer_asociados(raiz, am)
         print(f'   {am}: balance {"sí" if bal.get(am) else "no"} · cartera {"sí" if car.get(am) is not None else "no"} · aportes {"sí" if aso.get(am) is not None else "no"}')
-    sin_cat = sorted({x for d in car.values() if d is not None for x in d.loc[d['CAT'] == '', 'LINEA'].unique()})
-    if sin_cat:
-        print(f'   ! Líneas sin categoría en la hoja PRODUCTOS (no cuentan en CATEGORIAS): {", ".join(sin_cat)}')
+    nuevas = sorted({x for d in car.values() if d is not None for x in d['LINEA'].unique() if _n(x) not in listadas})
+    if nuevas:
+        print(f'   ! Líneas del repositorio que no están en la hoja LINEAS (asígneles grupo si corresponde): {", ".join(nuevas)}')
 
     def ant(am):
         y, m = divmod(am, 100)
@@ -346,7 +362,7 @@ def calcular(gen, variables):
                 k = k.strip().upper()
                 if k == 'TOTAL':
                     val = d['SALDO_CAPITAL'].sum()
-                elif k == 'CATEGORIAS':
+                elif k in ('GRUPO', 'CATEGORIAS'):
                     cs = {x.strip().lower() for x in arg.split(';') if x.strip()}
                     val = d.loc[d['CAT'].str.lower().isin(cs), 'SALDO_CAPITAL'].sum()
                 elif k == 'MORA_OBJETIVA':
@@ -447,7 +463,7 @@ def preparar(res, modo, tol, variables=()):
 
 
 def escribir_excel(escribir):
-    lock = os.path.join(BASE, '~$' + os.path.basename(TABLERO))
+    lock = os.path.join(os.path.dirname(TABLERO), '~$' + os.path.basename(TABLERO))
     if os.path.exists(lock):
         raise ErrorExtraccion('El tablero está abierto en Excel (existe ' + os.path.basename(lock) + '): ciérrelo y vuelva a ejecutar.')
     os.makedirs(RESPALDOS, exist_ok=True)
@@ -513,7 +529,7 @@ def guardar_informe(informe, modo, escribir):
 # ============================================================================================================
 # 5. LIBRO DE AUDITORÍA (Auditoria_Extraccion_PE.xlsx): datos de origen y todas las variables con fórmulas de Excel
 # ============================================================================================================
-AUDITORIA = os.path.join(BASE, 'Auditoria_Extraccion_PE.xlsx')
+AUDITORIA = os.path.join(BASE, 'Revision', 'Auditoria_Extraccion_PE.xlsx')
 
 
 def _col(i):
@@ -528,7 +544,7 @@ def _etm(am):
     return f'{ABREV[am % 100 - 1]}-{am // 100}'
 
 
-def generar_auditoria(variables, datos, res, informe):
+def generar_auditoria(variables, datos, res, informe, modo='', escribir=()):
     """Libro formulado para auditoría. Hojas:
     Leeme · Fuentes (archivo de cada mes) · Balance (NUEVO SALDO de las cuentas usadas, por mes) · Var_Balance (fórmulas sobre Balance)
     · Cartera_Datos (un crédito por fila y mes) · Var_Cartera (SUMAR.SI.CONJUNTO) · Transicion_Datos (un crédito por par de meses, con el
@@ -563,15 +579,24 @@ def generar_auditoria(variables, datos, res, informe):
         '',
         'Cada variable que el extractor escribe en Tablero_Indicadores_PE.xlsx está aquí calculada con fórmulas de Excel sobre los datos de origen:',
         '  Balance → hoja «Balance» de Solvencia_PT_Mes (NUEVO SALDO por cuenta). Var_Balance suma las cuentas de la definición; las de FUENTE BALANCE_MES restan el mes anterior (enero = acumulado).',
-        '  Cartera_Datos → repositorio de cartera (un crédito por fila y mes; CATEGORIA según la hoja PRODUCTOS del Modelo de Riesgos). Var_Cartera usa SUMAR.SI.CONJUNTO.',
+        '  Cartera_Datos → repositorio de cartera (un crédito por fila y mes; GRUPO según la hoja LINEAS de Parametros_Extraccion_PE.xlsx). Var_Cartera usa SUMAR.SI.CONJUNTO.',
         '  Transicion_Datos → un crédito por par de meses (anterior → actual) con calificación objetiva y saldo de cada mes; el MOVIMIENTO es fórmula.',
         '     Deterioro = saldo actual de los que pasan a peor calificación; Recuperación = saldo actual de los que pasan a mejor + saldo anterior de los cancelados que venían en B a E.',
         '  Asociados_Datos / Asociados_Dic → cédulas del individual de aportes; «estaba en diciembre» y «sigue en el mes» son fórmulas COINCIDIR.',
         '  Resumen → todas las variables por mes (enlazadas a las hojas Var_*). Comparacion → lo digitado en el tablero frente a la fórmula, con diferencia.',
         '',
-        'Definiciones editables en Parametros_Extraccion_PE.xlsx (hoja VARIABLES).',
+        'Definiciones editables en Parametros_Extraccion_PE.xlsx (hojas VARIABLES y LINEAS).',
+        '',
+        f'Esta corrida: modo {modo} · celdas escritas en el tablero: {len(escribir)}',
+        'Revisión del mes: hoja Comparacion, filtre ACCION DEL EXTRACTOR por «Difiere» (si no sale nada, todo cuadra con las fuentes).',
     ]:
         ws.append([t])
+    from collections import Counter
+    ws.append([])
+    ws.append(['Acciones del extractor en esta corrida'])
+    ws.cell(ws.max_row, 1).font = Font(bold=True)
+    for k, n_ in Counter(x[8] for x in informe).most_common():
+        ws.append([f'   {k}: {n_} celdas'])
     ws['A1'].font = Font(bold=True, size=14, color='0B5D3B')
     ws.column_dimensions['A'].width = 170
 
@@ -657,7 +682,7 @@ def generar_auditoria(variables, datos, res, informe):
     # ---- Cartera
     if vc:
         ws = wb.create_sheet('Cartera_Datos')
-        ws.append(['MES', 'CREDITO', 'LINEA', 'CATEGORIA', 'CALIF_OBJETIVA', 'SALDO_CAPITAL'])
+        ws.append(['MES', 'CREDITO', 'LINEA', 'GRUPO', 'CALIF_OBJETIVA', 'SALDO_CAPITAL'])
         for am in meses:
             d = car.get(am)
             if d is None:
@@ -709,7 +734,7 @@ def generar_auditoria(variables, datos, res, informe):
                 base = f"SUMIFS({R['F']},{R['A']},{am}"
                 if k == 'TOTAL':
                     f = f'={base})'
-                elif k == 'CATEGORIAS':
+                elif k in ('GRUPO', 'CATEGORIAS'):
                     f = '=' + '+'.join(f'{base},{R["D"]},"{x.strip()}")' for x in arg.split(';') if x.strip())
                 elif k == 'MORA_OBJETIVA':
                     f = '=' + '+'.join(f'{base},{R["E"]},"{x}")' for x in 'BCDE')
@@ -842,14 +867,16 @@ def generar_auditoria(variables, datos, res, informe):
     for n in ('Resumen', 'Var_Balance', 'Var_Cartera', 'Var_Asociados', 'Comparacion'):
         if n in wb.sheetnames:
             wb[n].sheet_properties.tabColor = '0B5D3B'
-    if os.path.exists(os.path.join(BASE, '~$' + os.path.basename(AUDITORIA))):
+    wb.active = wb.sheetnames.index('Comparacion')            # el libro abre en la comparación
+    os.makedirs(os.path.dirname(AUDITORIA), exist_ok=True)
+    if os.path.exists(os.path.join(os.path.dirname(AUDITORIA), '~$' + os.path.basename(AUDITORIA))):
         print(f'   ! {os.path.basename(AUDITORIA)} está abierto en Excel: no se actualizó (ciérrelo y vuelva a ejecutar para regenerarlo)')
-        return
+        return False
     try:
         wb.save(AUDITORIA)
     except PermissionError:
         print(f'   ! No se pudo guardar {os.path.basename(AUDITORIA)} (¿abierto en Excel?): no se actualizó')
-        return
+        return False
     # Excel calcula y guarda los valores para que el libro se vea completo al abrirlo; se comprueba contra el cálculo de Python
     try:
         import pythoncom
@@ -861,6 +888,7 @@ def generar_auditoria(variables, datos, res, informe):
             xl.DisplayAlerts = False
             w = xl.Workbooks.Open(AUDITORIA, UpdateLinks=0)
             xl.CalculateFull()
+            w.Worksheets('Comparacion').Activate()
             malos = 0
             hr = w.Worksheets('Resumen')
             for i, v in enumerate(variables):
@@ -874,10 +902,12 @@ def generar_auditoria(variables, datos, res, informe):
         finally:
             xl.Quit()
             pythoncom.CoUninitialize()
-        print(f'Auditoría: {AUDITORIA} · fórmulas de Excel frente al cálculo de Python: '
+        print(f'Revisión y auditoría: {AUDITORIA} · fórmulas de Excel frente al cálculo de Python: '
               + ('todas coinciden' if not malos else f'{malos} diferencias (revisar)'))
+        print(f'   Comparación digitado vs. fuentes: {sum(1 for x in informe if str(x[8]).startswith("Difiere"))} celdas difieren (hoja Comparacion)')
     except Exception as e:                                   # noqa: BLE001
         print(f'Auditoría: {AUDITORIA} (sin recalcular en Excel: {e}; Excel lo calcula al abrirlo)')
+    return True
 
 
 # ============================================================================================================
@@ -904,12 +934,15 @@ def main():
     informe, escribir = preparar(res, modo, tol, variables)
     if solo:                                                  # el informe es completo; solo se escriben las hojas pedidas
         escribir = [x for x in escribir if x[0].upper() in solo]
-    guardar_informe(informe, modo, escribir)
-    generar_auditoria(variables, datos, res, informe)
-    print(f'Informe: {INFORME}')
+    ok_aud = generar_auditoria(variables, datos, res, informe, modo, escribir)
+    if not ok_aud:                                            # sin libro de revisión: las diferencias se muestran aquí
+        dif = [x for x in informe if str(x[8]).startswith('Difiere')]
+        print(f'   Diferencias digitado vs. fuentes: {len(dif)}')
+        for x in dif[:40]:
+            print(f'     {x[0]} · {x[1]} · {x[3]} {x[2]}: digitado {x[4]:,.2f} · fuentes {x[5]:,.2f}')
     if modo != 'COMPARAR' and escribir:
         escribir_excel(escribir)
-        print(f'Se escribieron {len(escribir)} celdas en {os.path.basename(TABLERO)}; ahora puede ejecutar Plan_Estrategico_Dashboard.py')
+        print(f'Se escribieron {len(escribir)} celdas en {os.path.basename(TABLERO)}; ahora puede ejecutar 3_Generar_dashboard.py')
     else:
         print('No se escribió nada en el tablero.' if modo == 'COMPARAR' else 'No había celdas por escribir.')
 

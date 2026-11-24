@@ -2,55 +2,50 @@
 
 Generador automático de dashboard HTML para el seguimiento del Plan Estratégico.
 
-**Un solo script Python** lee el archivo Excel del modelo, procesa los datos mensualmente desde enero 2026 hasta diciembre 2030, calcula resultados, cumplimiento, semáforos, tendencias y alertas, y genera un **dashboard HTML interactivo, responsive y autocontenido** listo para publicar en GitHub Pages.
+Dos scripts Python en orden de proceso: el primero toma los datos de las fuentes de información y llena el Excel; el segundo lee el Excel, calcula resultados, cumplimiento, semáforos, tendencias y alertas, y genera un **dashboard HTML interactivo y autocontenido** publicado en GitHub Pages.
 
 ---
 
-## Estructura del proyecto
+## Estructura del proyecto (en orden de proceso)
 
 ```
-proyecto/
-├── "Plan Estrategico Dashboard.py"          ← ÚNICO script (con todo dentro)
-├── chart_umd.js                  ← Chart.js (opcional, para offline)
-├── Tablero_Indicadores_PE.xlsx
-└── dashboard/
-    └── index.html                ← salida (auto-generada)
+Planeacion Estratégica 2026-2030/
+├── 0_Actualizar_mes.bat            ← doble clic cada mes: corre 1, abre 2 para lo manual y corre 3
+├── 1_Extraer_indicadores.py        ← fuentes de información → celdas azules del Excel
+├── 2_Tablero_Indicadores_PE.xlsx   ← el modelo en Excel (aquí se digita lo manual)
+├── 3_Generar_dashboard.py          ← Excel → docs/index.html y publicación en GitHub
+├── Configuracion/
+│   └── Parametros_Extraccion_PE.xlsx   ← rutas, cuentas contables, reglas, líneas de mayor rendimiento
+├── Revision/
+│   └── Auditoria_Extraccion_PE.xlsx    ← comparación digitado vs. fuentes y cálculo formulado (se regenera)
+├── docs/
+│   └── index.html                  ← dashboard publicado (GitHub Pages)
+├── Soporte/                        ← chart_umd.js y material de apoyo
+└── _respaldos/                     ← copias automáticas antes de escribir
 ```
 
-Si no incluye `chart_umd.js`, el dashboard cargará Chart.js desde CDN (jsdelivr).
-Si lo incluye, queda totalmente offline-capable.
+Los Excel no se suben a GitHub (`.gitignore`); solo se publica `docs/index.html`.
 
 ## Requisitos
 
-- Python 3.8+
-- Una sola dependencia: `pip install openpyxl`
-
-## Uso
-
-```bash
-python3 "Plan Estrategico Dashboard.py"
-```
-
-Opciones:
-
-```bash
-python3 "Plan Estrategico Dashboard.py" <ruta_excel> <ruta_salida>
-```
-
-Por defecto:
-- Entrada: `Tablero_Indicadores_PE.xlsx`
-- Salida: `dashboard/index.html`
+- Python 3.8+, `pip install openpyxl pandas pywin32` y Microsoft Excel (el paso 1 escribe a través de Excel para conservar fórmulas y comentarios)
+- Acceso de lectura a la carpeta «Fuentes de información» del Modelo de Riesgos (ruta en `Configuracion/Parametros_Extraccion_PE.xlsx`)
 
 ## Flujo mensual
 
-1. Abra el Excel y registre las variables del mes en las hojas `IND-XX` (celdas azules).
-2. Guarde el Excel.
-3. Ejecute `python3 "Plan Estrategico Dashboard.py"`.
-4. Abra `dashboard/index.html` en el navegador.
+Doble clic en `0_Actualizar_mes.bat`, o paso a paso:
 
-## Estructura interna del script
+```bash
+python 1_Extraer_indicadores.py          # llena las celdas vacías desde las fuentes (--comparar, --reemplazar, --hojas IND-13)
+# digite en 2_Tablero_Indicadores_PE.xlsx lo que no sale de las fuentes (IPC, fallecidos, encuestas...), guarde y cierre
+python 3_Generar_dashboard.py            # genera docs/index.html y lo publica (--no-publish para no publicar)
+```
 
-El script `Plan Estrategico Dashboard.py` está dividido internamente en 8 secciones bien delimitadas por comentarios:
+Revise `Revision/Auditoria_Extraccion_PE.xlsx` (hoja Comparacion): si al filtrar «Difiere» no sale nada, lo digitado cuadra con las fuentes.
+
+## Estructura interna del script del dashboard
+
+El script `3_Generar_dashboard.py` está dividido internamente en 8 secciones bien delimitadas por comentarios:
 
 1. **Catálogo de indicadores** (datos del modelo: nombres, fórmulas, metas, tipos)
 2. **Plantillas HTML / CSS / JS** (con la paleta KALLA)
