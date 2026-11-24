@@ -549,6 +549,10 @@ body {
   backdrop-filter: blur(8px);
 }
 .header-logo-box svg { width: 28px; height: 28px; color: white; }
+/* logo de Febor (Soporte/logo_febor.png): visible también en tablet y celular, más pequeño */
+.header-logo-img { height: 64px; width: auto; display: block; }
+@media (max-width: 768px) { .header .header-brand.header-brand-logo { display: flex !important; border-right: 0; padding-right: 0; } .header-logo-img { height: 42px; } }
+@media (max-width: 480px) { .header-logo-img { height: 34px; } }
 .header-brand-text { display: flex; flex-direction: column; gap: 1px; }
 .header-brand-name {
   font-size: 1.10rem; font-weight: 900; color: white;
@@ -5244,18 +5248,7 @@ __CSS__
     <!-- Fila superior: marca + título + botón -->
     <div class="header-inner">
       <!-- Brand FEBOR -->
-      <div class="header-brand">
-        <div class="header-logo-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
-          </svg>
-        </div>
-        <div class="header-brand-text">
-          <div class="header-brand-name">Febor</div>
-          <div class="header-brand-sub">Entidad Cooperativa</div>
-        </div>
-      </div>
+      __BRAND__
 
       <!-- Título -->
       <div class="header-titles">
@@ -5289,12 +5282,6 @@ __CSS__
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M13 5l7 7-7 7"/></svg>
           </div>
           <span class="xl-label">Ir a la Ruta de Planeación Estratégica</span>
-        </a>
-        <a href="https://feborentidad.sharepoint.com/:f:/s/Riesgos/IgCyJeu9SCtOQK7ZPM6BcfJlASf2_0UdUDIXTZgCNjUiAH4?e=Og8tzB" target="_blank" class="btn-datos-origen">
-          <div class="xl-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-          </div>
-          <span class="xl-label">Agregar datos al origen</span>
         </a>
         <button class="btn-excel-consolidado" onclick="exportConsolidado()">
           <div class="xl-icon">
@@ -5460,6 +5447,22 @@ def _load_chartjs():
     )
 
 
+BRAND_SIN_LOGO = '<div class="header-brand">\n        <div class="header-logo-box">\n          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">\n            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>\n            <polyline points="9 22 9 12 15 12 15 22"/>\n          </svg>\n        </div>\n        <div class="header-brand-text">\n          <div class="header-brand-name">Febor</div>\n          <div class="header-brand-sub">Entidad Cooperativa</div>\n        </div>\n      </div>'
+
+
+def _brand_html():
+    """Logo de Febor (Soporte/logo_febor.png) embebido en el encabezado; si no está, la marca de texto de antes."""
+    import base64
+    import os
+    here = os.path.dirname(os.path.abspath(__file__))
+    for f in (os.path.join(here, 'Soporte', 'logo_febor.png'), os.path.join(here, 'logo_febor.png')):
+        if os.path.exists(f):
+            b64 = base64.b64encode(open(f, 'rb').read()).decode()
+            return ('<div class="header-brand header-brand-logo"><img class="header-logo-img" alt="Febor Entidad Cooperativa" '
+                    'src="data:image/png;base64,' + b64 + '"></div>')
+    return BRAND_SIN_LOGO
+
+
 def render_dashboard_html(payload, xlsx_path=None):
     """Renderiza el dashboard como HTML autocontenido (incluye Chart.js inline)."""
     json_str = json.dumps(payload, ensure_ascii=False, indent=2)
@@ -5469,7 +5472,8 @@ def render_dashboard_html(payload, xlsx_path=None):
             .replace('__CSS__', CSS)
             .replace('__JS__', JS)
             .replace('__DATA_JSON__', json_str)
-            .replace('__XLSX_B64__', xlsx_b64))
+            .replace('__XLSX_B64__', xlsx_b64)
+            .replace('__BRAND__', _brand_html()))
     return html
 
 
