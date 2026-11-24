@@ -5963,6 +5963,9 @@ def compute_compliance(result, meta, tend, tipo=None):
     """
     if result is None or meta is None:
         return None
+    # meta o resultado que no son número (p. ej. «#VALUE!» cuando falta el IPC del mes, o «>= IPC»): cumplimiento pendiente, como en el Excel
+    if not isinstance(meta, (int, float)) or isinstance(meta, bool) or not isinstance(result, (int, float)) or isinstance(result, bool):
+        return None
 
     # Si se pasa cumpl_formula_type como tipo, usarlo directamente
     if tipo == 'directo':
